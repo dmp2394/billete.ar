@@ -13,9 +13,18 @@ public class Billetera implements IBilletera {
 	// CONSTRUCTOR. INICIALIZO VARIABLES
 	public Billetera() {
 		this.diccEmpresasPorCuit = new HashMap<>();
+		this.diccUsuariosPorDni = new HashMap<>();
+		this.diccCuentasPorCvu = new HashMap<>();
 	}
 
 	// METODOS PUBLICOS:
+	@Override
+	public String toString() {
+		// TODO: actualizar esto al final
+		return ("cantidad de usuarios, empresas, cuentas, etc");
+	}
+	
+	
 	@Override
 	public void registrarEmpresa(String cuit, String nombreFantasia, String telefono, String email,
 			String nombreContacto) {
@@ -74,7 +83,7 @@ public class Billetera implements IBilletera {
 	@Override
 	public String crearCuentaPremium(String dniUsuario, String alias, double depositoInicial) {
 
-		CuentaPrenium cuentaPremium = new CuentaPrenium(dniUsuario, alias, depositoInicial);
+		CuentaPremium cuentaPremium = new CuentaPremium(dniUsuario, alias, depositoInicial);
 		cuentaPremium.validarCampos();
 		if (!diccUsuariosPorDni.containsKey(dniUsuario))
 			throw new IllegalArgumentException("el usuario no esta registrado");
@@ -129,8 +138,7 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public double obtenerSaldoDisponible(String cvu) {
-		// TODO Auto-generated method stub
-		return 0;
+		return diccCuentasPorCvu.get(cvu).getSaldo();
 	}
 
 	@Override

@@ -4,10 +4,12 @@ public abstract class Cuenta {
 
     private String dniUsuario;
     private String alias;
+    protected double saldo;
 
     public Cuenta(String dniUsuario, String alias) {
         this.dniUsuario = dniUsuario;
         this.alias = alias;
+        this.saldo = 0;
     }
 
     public void validarCampos() {
@@ -34,5 +36,9 @@ public abstract class Cuenta {
     public String toString() {
         return "Cuenta [dniUsuario=" + dniUsuario + ", alias=" + alias + "]";
     }
+
+	public double getSaldo() {
+		return this.saldo;
+	}
 
 }
