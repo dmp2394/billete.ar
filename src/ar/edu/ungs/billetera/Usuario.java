@@ -7,13 +7,6 @@ public class Usuario {
     private String email;
 
     public Usuario(String dni, String nombre, String telefono, String email) {
-        this.dni = dni;
-        this.nombre = nombre;
-        this.telefono = telefono;
-        this.email = email;
-    }
-
-    private void validarCampos() {
         if (dni == null || dni.trim().isEmpty()) {
             throw new IllegalArgumentException("El DNI no puede estar vacío.");
         }
@@ -28,11 +21,10 @@ public class Usuario {
         }
         if (!email.contains("@"))
             throw new IllegalArgumentException("El email cargado debe tener el caracter @");
-
-    }
-
-    public void validarCamposPublico() {
-        validarCampos();
+        this.dni = dni;
+        this.nombre = nombre;
+        this.telefono = telefono;
+        this.email = email;
     }
 
     public String getDni() {

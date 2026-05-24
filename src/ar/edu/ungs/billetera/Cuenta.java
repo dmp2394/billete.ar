@@ -8,23 +8,17 @@ public abstract class Cuenta {
     protected String cvu;
 
     public Cuenta(String dniUsuario, String alias) {
-        this.dniUsuario = dniUsuario;
-        this.alias = alias;
-        this.saldo = 0;
-        this.cvu = Utilitarios.generarSiguienteCvu();
-    }
-
-    private void validarCampos() {
         if (dniUsuario == null || dniUsuario.trim().isEmpty()) {
             throw new IllegalArgumentException("El DNI del usuario no puede estar vacío.");
         }
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("El alias de la cuenta no puede estar vacío.");
         }
-    }
 
-    public void validarCamposPublico() {
-        validarCampos();
+        this.dniUsuario = dniUsuario;
+        this.alias = alias;
+        this.saldo = 0;
+        this.cvu = Utilitarios.generarSiguienteCvu();
     }
 
     public String toString() {

@@ -59,7 +59,6 @@ public class Billetera implements IBilletera {
 	public void registrarUsuario(String dni, String nombre, String telefono, String email) {
 
 		Usuario usuario = new Usuario(dni, nombre, telefono, email); // creo el usuario con los datos ingresados
-		usuario.validarCamposPublico(); // valida que los valores ingresados sean correctos, sino lanza error
 
 		if (diccUsuariosPorDni.containsKey(dni)) // busca si ya esta registrado un usuario con ese dni, si es asi lanza
 													// error
@@ -90,7 +89,7 @@ public class Billetera implements IBilletera {
 	public String crearCuentaPremium(String dniUsuario, String alias, double depositoInicial) {
 
 		CuentaPremium cuentaPremium = new CuentaPremium(dniUsuario, alias, depositoInicial);
-		cuentaPremium.validarCamposPublico();
+		// cuentaPremium.validarCamposPublico();
 
 		if (!diccUsuariosPorDni.containsKey(dniUsuario))
 			throw new IllegalArgumentException("el usuario no esta registrado");
@@ -109,7 +108,7 @@ public class Billetera implements IBilletera {
 	public String crearCuentaCorporativa(String dniUsuario, String alias, String cuitEmpresa) {
 
 		CuentaCorporativa cuentaCorporativa = new CuentaCorporativa(dniUsuario, alias, cuitEmpresa);
-		cuentaCorporativa.validarCamposPublico();
+		// cuentaCorporativa.validarCamposPublico();
 		if (!diccUsuariosPorDni.containsKey(dniUsuario))
 			throw new IllegalArgumentException("el usuario no esta registrado");
 		if (diccCuentasPorCvu.containsKey(alias))
