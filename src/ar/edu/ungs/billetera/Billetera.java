@@ -253,6 +253,9 @@ public class Billetera implements IBilletera {
 
 		if (cuenta.getSaldo() < monto)
 			throw new IllegalArgumentException("Saldo insuficiente para realizar la inversión.");
+		
+		if (!(cuenta instanceof CuentaCorporativa))
+			throw new IllegalArgumentException("Esta inversion solo puede realizarse desde una Cuenta Corporativa");
 
 		InversionLiquidez inversion = new InversionLiquidez(cvu, monto, plazoDias);
 		inversion.validarCampos();
@@ -290,18 +293,13 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public String consultarCvu(String alias) {
-		/**
-	     * [Nuevo]
-	     * 14) Dado un alias consultar el CVU asociado.
-	     * Lanza error si el alias no está registrado.
-	     *
-	     * @param alias Alias para consultar el CVU.
-	     * @return cvu asociado al alias. Si el alias no está registrado debe lanzar una
-	     *         excepción.
-	     */
 		
+		// podria haber diccAliasPorCvu, no hay un req de que esto debe ser en O(1), por lo que para no extender demasiado las estructuras de datos se implementa asi. Complejidad O(n)
+		for (Cuenta cuenta : diccCuentasPorCvu.values())
+		    if (alias.equals(cuenta.getAlias()))
+		        return cuenta.getCvu();
 
-		return null;
+		throw new IllegalArgumentException("el alias no esta registrado");
 	}
 
 	@Override
