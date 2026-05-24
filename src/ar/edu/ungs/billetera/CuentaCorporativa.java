@@ -25,5 +25,16 @@ public class CuentaCorporativa extends Cuenta {
         return "CuentaCorporativa [dniUsuario=" + getDniUsuario() + ", alias=" + getAlias()
                 + ", cuitEmpresa=" + cuitEmpresa + "]";
     }
+    
+    public void acreditar(double monto) {
+    	this.saldo += monto;
+    }
+    
+    public void debitar(double monto) {
+    	if (this.saldo - monto < 0)
+    		throw new IllegalStateException("saldo insuficiente");
+    	
+    	this.saldo-=monto;
+    }
 
 }

@@ -70,15 +70,15 @@ public class Billetera implements IBilletera {
 	@Override
 	public String crearCuentaRegular(String dniUsuario, String alias) {
 
-		CuentaRegular cuentaRegular = new CuentaRegular(dniUsuario, alias); // crea la cuenta con los datos ingresados
-		cuentaRegular.validarCampos(); // valida que los valores ingresados sean correctos, sino lanza error
 		if (!diccUsuariosPorDni.containsKey(dniUsuario)) // busca si el usuario existe, si no existe lanza error
 			throw new IllegalArgumentException("el usuario no esta registrado");
 		if (diccCuentasPorCvu.containsKey(alias)) // busca si el alias ya esta registrado, si es asi lanza error
 			throw new IllegalArgumentException("el alias ya esta registrado");
 
-		String cvu = cuentaRegular.crearCVU(); // si el usuario existe y el alias no esta registrado, crea un cvu para
-												// la cuenta y la agrega al diccionario de cuentas
+		CuentaRegular cuentaRegular = new CuentaRegular(dniUsuario, alias); // crea la cuenta con los datos ingresados
+
+		String cvu = cuentaRegular.getCvu();
+		
 		diccCuentasPorCvu.put(cvu, cuentaRegular); // agrega la cuenta al diccionario de cuentas con el cvu como clave
 		diccActividadesPorCvu.put(cvu, new java.util.ArrayList<>()); // Inicializar lista de actividades para la cuenta
 
@@ -94,7 +94,9 @@ public class Billetera implements IBilletera {
 			throw new IllegalArgumentException("el usuario no esta registrado");
 		if (diccCuentasPorCvu.containsKey(alias))
 			throw new IllegalArgumentException("el alias ya esta registrado");
-		String cvu = cuentaPremium.crearCVU();
+		
+		String cvu = cuentaPremium.getCvu();
+		
 		diccCuentasPorCvu.put(cvu, cuentaPremium);
 		diccActividadesPorCvu.put(cvu, new java.util.ArrayList<>());
 
@@ -112,7 +114,7 @@ public class Billetera implements IBilletera {
 			throw new IllegalArgumentException("el alias ya esta registrado");
 		if (!diccEmpresasPorCuit.containsKey(cuitEmpresa))
 			throw new IllegalArgumentException("la empresa no esta registrada");
-		String cvu = cuentaCorporativa.crearCVU();
+		String cvu = cuentaCorporativa.getCvu();
 		diccCuentasPorCvu.put(cvu, cuentaCorporativa);
 		diccActividadesPorCvu.put(cvu, new java.util.ArrayList<>());
 		return cvu;
@@ -150,24 +152,26 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public void realizarTransferencia(String cvuOrigen, String cvuDestino, double monto) {
-
+		
 		if (!diccCuentasPorCvu.containsKey(cvuOrigen))
 			throw new IllegalArgumentException("La cuenta de origen no existe.");
 
 		if (!diccCuentasPorCvu.containsKey(cvuDestino))
 			throw new IllegalArgumentException("La cuenta de destino no existe.");
 
+		Transferencia transferencia = new Transferencia(cvuOrigen, cvuDestino, monto);
+		transferencia.validarCampos();
+		
 		Cuenta cuentaOrigen = diccCuentasPorCvu.get(cvuOrigen);
-		Cuenta cuentaDestino = diccCuentasPorCvu.get(cvuDestino);
 
 		if (cuentaOrigen.getSaldo() < monto)
 			throw new IllegalArgumentException("Saldo insuficiente en la cuenta de origen.");
 
-		Transferencia transferencia = new Transferencia(cvuOrigen, cvuDestino, monto);
-		transferencia.validarCampos();
+		
+		Cuenta cuentaDestino = diccCuentasPorCvu.get(cvuDestino);
 
-		cuentaOrigen.saldo -= monto;
-		cuentaDestino.saldo += monto;
+		cuentaOrigen.debitar(monto);
+		cuentaDestino.acreditar(monto);
 
 		diccActividadesPorDNI.get(cuentaOrigen.getDniUsuario()).add(transferencia);
 		diccActividadesPorDNI.get(cuentaDestino.getDniUsuario()).add(transferencia);
@@ -197,7 +201,7 @@ public class Billetera implements IBilletera {
 		inversion.validarCampos();
 		int idInversion = inversion.getIdInversion();
 
-		cuenta.saldo -= monto;
+		cuenta.debitar(monto);
 
 		diccActividadesPorDNI.get(dni).add(inversion);
 		diccActividadesPorCvu.get(cvu).add(inversion);
@@ -227,7 +231,7 @@ public class Billetera implements IBilletera {
 		inversion.validarCampos();
 		int idInversion = inversion.getIdInversion();
 
-		cuenta.saldo -= monto;
+		cuenta.debitar(monto);
 
 		diccActividadesPorDNI.get(dni).add(inversion);
 		diccActividadesPorCvu.get(cvu).add(inversion);
@@ -253,7 +257,8 @@ public class Billetera implements IBilletera {
 		InversionLiquidez inversion = new InversionLiquidez(cvu, monto, plazoDias);
 		inversion.validarCampos();
 		int idInversion = inversion.getIdInversion();
-		cuenta.saldo -= monto;
+		cuenta.debitar(monto);
+		
 		diccActividadesPorDNI.get(dni).add(inversion);
 		diccActividadesPorCvu.get(cvu).add(inversion);
 		return idInversion;
@@ -261,11 +266,25 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public void precancelarInversion(String dni, String cvu, int idInversion) {
+		/**
+	     * [Nuevo]
+	     * 13) Precancela una inversión activa de forma anticipada.
+	     * Lanza error si algun dato es inválido, la inversión no existe o no está
+	     * activa.
+	     *
+	     * @param dni         El DNI del usuario.
+	     * @param cvu         El CVU de la cuenta asociada a la inversión.
+	     * @param idInversion El identificador único de la inversión a cancelar.
+	     */
+		
+		// 
+		
 		if (!diccUsuariosPorDni.containsKey(dni))
 			throw new IllegalArgumentException("El usuario no está registrado.");
 
 		if (!diccCuentasPorCvu.containsKey(cvu))
 			throw new IllegalArgumentException("La cuenta no existe.");
+		
 
 	}
 

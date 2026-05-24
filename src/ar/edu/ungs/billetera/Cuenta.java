@@ -2,14 +2,16 @@ package ar.edu.ungs.billetera;
 
 public abstract class Cuenta {
 
-    private String dniUsuario;
-    private String alias;
+    protected String dniUsuario;
+    protected String alias;
     protected double saldo;
+    protected String cvu;
 
     public Cuenta(String dniUsuario, String alias) {
         this.dniUsuario = dniUsuario;
         this.alias = alias;
         this.saldo = 0;
+        this.cvu = Utilitarios.generarSiguienteCvu();
     }
 
     public void validarCampos() {
@@ -21,6 +23,10 @@ public abstract class Cuenta {
         }
     }
 
+    public String toString() {
+    	return "Cuenta [dniUsuario=" + dniUsuario + ", alias=" + alias + "]";
+    }
+
     public String getDniUsuario() {
         return dniUsuario;
     }
@@ -29,16 +35,16 @@ public abstract class Cuenta {
         return alias;
     }
 
-    public String crearCVU() {
-        return String.valueOf((long) (Math.random() * 1000000000));
-    }
-
-    public String toString() {
-        return "Cuenta [dniUsuario=" + dniUsuario + ", alias=" + alias + "]";
-    }
-
     public double getSaldo() {
         return this.saldo;
     }
+    
+    public String getCvu() {
+        return cvu;
+    }
 
+    // metodos abstractos asi las subclases deben implementarlos si o si
+    public abstract void debitar(double monto);
+    public abstract void acreditar(double monto);
+    
 }
