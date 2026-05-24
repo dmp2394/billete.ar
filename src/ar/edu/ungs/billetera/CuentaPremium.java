@@ -2,11 +2,9 @@ package ar.edu.ungs.billetera;
 
 public class CuentaPremium extends Cuenta {
 
-
     private double depositoInicial;
 
-
-	public CuentaPremium(String dniUsuario, String alias, double depositoInicial) {
+    public CuentaPremium(String dniUsuario, String alias, double depositoInicial) {
         super(dniUsuario, alias);
         this.saldo = depositoInicial;
         this.depositoInicial = depositoInicial;

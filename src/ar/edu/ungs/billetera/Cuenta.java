@@ -37,8 +37,8 @@ public abstract class Cuenta {
         return "Cuenta [dniUsuario=" + dniUsuario + ", alias=" + alias + "]";
     }
 
-	public double getSaldo() {
-		return this.saldo;
-	}
+    public double getSaldo() {
+        return this.saldo;
+    }
 
 }
