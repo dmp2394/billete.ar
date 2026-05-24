@@ -13,7 +13,7 @@ public class Usuario {
         this.email = email;
     }
 
-    public void validarCampos() {
+    private void validarCampos() {
         if (dni == null || dni.trim().isEmpty()) {
             throw new IllegalArgumentException("El DNI no puede estar vacío.");
         }
@@ -29,6 +29,10 @@ public class Usuario {
         if (!email.contains("@"))
             throw new IllegalArgumentException("El email cargado debe tener el caracter @");
 
+    }
+
+    public void validarCamposPublico() {
+        validarCampos();
     }
 
     public String getDni() {

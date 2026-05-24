@@ -14,7 +14,7 @@ public abstract class Cuenta {
         this.cvu = Utilitarios.generarSiguienteCvu();
     }
 
-    public void validarCampos() {
+    private void validarCampos() {
         if (dniUsuario == null || dniUsuario.trim().isEmpty()) {
             throw new IllegalArgumentException("El DNI del usuario no puede estar vacío.");
         }
@@ -23,8 +23,12 @@ public abstract class Cuenta {
         }
     }
 
+    public void validarCamposPublico() {
+        validarCampos();
+    }
+
     public String toString() {
-    	return "Cuenta [dniUsuario=" + dniUsuario + ", alias=" + alias + "]";
+        return "Cuenta [dniUsuario=" + dniUsuario + ", alias=" + alias + "]";
     }
 
     public String getDniUsuario() {
@@ -38,13 +42,14 @@ public abstract class Cuenta {
     public double getSaldo() {
         return this.saldo;
     }
-    
+
     public String getCvu() {
         return cvu;
     }
 
     // metodos abstractos asi las subclases deben implementarlos si o si
     public abstract void debitar(double monto);
+
     public abstract void acreditar(double monto);
-    
+
 }

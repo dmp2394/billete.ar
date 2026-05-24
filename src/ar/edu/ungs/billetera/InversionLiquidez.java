@@ -11,11 +11,11 @@ public class InversionLiquidez extends Inversion {
     // si la inversión fué precancelada, se paga la mitad de la
     // rentabilidad generada hasta al momento
 
-    @Deprecated
-    public double calcularInteres() {
-        double cotizacion = Utilitarios.consultarCotizacion(getCvu());
-        return getMonto() * activoFLE * cotizacion * getPlazoDias() / 365;
-    }
+    // @Deprecated
+    // public double calcularInteres() {
+    // double cotizacion = Utilitarios.consultarCotizacion(getCvu());
+    // return getMonto() * activoFLE * cotizacion * getPlazoDias() / 365;
+    // }
 
     public double getActivoFLE() {
         return activoFLE;

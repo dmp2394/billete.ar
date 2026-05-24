@@ -2,26 +2,21 @@ package ar.edu.ungs.billetera;
 
 import java.time.LocalDate;
 
-
 public class Inversion extends Actividad {
 
-	private static int contadorId = 1;
+    private static int contadorId = 1;
 
     private int plazoDias;
     private int idInversion;
 
     public Inversion(String cvu, double monto, int plazoDias) {
         super(LocalDate.now(), monto, cvu);
-        this.plazoDias = plazoDias;
-        this.idInversion = contadorId++;
-    }
-
-    @Override
-    public void validarCampos() {
-        super.validarCampos();
         if (plazoDias <= 0) {
             throw new IllegalArgumentException("El plazo en días debe ser mayor a cero.");
         }
+
+        this.plazoDias = plazoDias;
+        this.idInversion = contadorId++;
     }
 
     public double calcularInteres() {

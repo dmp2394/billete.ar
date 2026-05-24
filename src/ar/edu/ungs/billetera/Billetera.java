@@ -59,7 +59,8 @@ public class Billetera implements IBilletera {
 	public void registrarUsuario(String dni, String nombre, String telefono, String email) {
 
 		Usuario usuario = new Usuario(dni, nombre, telefono, email); // creo el usuario con los datos ingresados
-		usuario.validarCampos(); // valida que los valores ingresados sean correctos, sino lanza error
+		usuario.validarCamposPublico(); // valida que los valores ingresados sean correctos, sino lanza error
+
 		if (diccUsuariosPorDni.containsKey(dni)) // busca si ya esta registrado un usuario con ese dni, si es asi lanza
 													// error
 			throw new IllegalArgumentException("el usuario ya esta registrado");
@@ -78,7 +79,7 @@ public class Billetera implements IBilletera {
 		CuentaRegular cuentaRegular = new CuentaRegular(dniUsuario, alias); // crea la cuenta con los datos ingresados
 
 		String cvu = cuentaRegular.getCvu();
-		
+
 		diccCuentasPorCvu.put(cvu, cuentaRegular); // agrega la cuenta al diccionario de cuentas con el cvu como clave
 		diccActividadesPorCvu.put(cvu, new java.util.ArrayList<>()); // Inicializar lista de actividades para la cuenta
 
@@ -89,14 +90,15 @@ public class Billetera implements IBilletera {
 	public String crearCuentaPremium(String dniUsuario, String alias, double depositoInicial) {
 
 		CuentaPremium cuentaPremium = new CuentaPremium(dniUsuario, alias, depositoInicial);
-		cuentaPremium.validarCampos();
+		cuentaPremium.validarCamposPublico();
+
 		if (!diccUsuariosPorDni.containsKey(dniUsuario))
 			throw new IllegalArgumentException("el usuario no esta registrado");
 		if (diccCuentasPorCvu.containsKey(alias))
 			throw new IllegalArgumentException("el alias ya esta registrado");
-		
+
 		String cvu = cuentaPremium.getCvu();
-		
+
 		diccCuentasPorCvu.put(cvu, cuentaPremium);
 		diccActividadesPorCvu.put(cvu, new java.util.ArrayList<>());
 
@@ -107,7 +109,7 @@ public class Billetera implements IBilletera {
 	public String crearCuentaCorporativa(String dniUsuario, String alias, String cuitEmpresa) {
 
 		CuentaCorporativa cuentaCorporativa = new CuentaCorporativa(dniUsuario, alias, cuitEmpresa);
-		cuentaCorporativa.validarCampos();
+		cuentaCorporativa.validarCamposPublico();
 		if (!diccUsuariosPorDni.containsKey(dniUsuario))
 			throw new IllegalArgumentException("el usuario no esta registrado");
 		if (diccCuentasPorCvu.containsKey(alias))
@@ -152,7 +154,7 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public void realizarTransferencia(String cvuOrigen, String cvuDestino, double monto) {
-		
+
 		if (!diccCuentasPorCvu.containsKey(cvuOrigen))
 			throw new IllegalArgumentException("La cuenta de origen no existe.");
 
@@ -161,13 +163,12 @@ public class Billetera implements IBilletera {
 
 		Transferencia transferencia = new Transferencia(cvuOrigen, cvuDestino, monto);
 		transferencia.validarCampos();
-		
+
 		Cuenta cuentaOrigen = diccCuentasPorCvu.get(cvuOrigen);
 
 		if (cuentaOrigen.getSaldo() < monto)
 			throw new IllegalArgumentException("Saldo insuficiente en la cuenta de origen.");
 
-		
 		Cuenta cuentaDestino = diccCuentasPorCvu.get(cvuDestino);
 
 		cuentaOrigen.debitar(monto);
@@ -253,7 +254,7 @@ public class Billetera implements IBilletera {
 
 		if (cuenta.getSaldo() < monto)
 			throw new IllegalArgumentException("Saldo insuficiente para realizar la inversión.");
-		
+
 		if (!(cuenta instanceof CuentaCorporativa))
 			throw new IllegalArgumentException("Esta inversion solo puede realizarse desde una Cuenta Corporativa");
 
@@ -261,7 +262,7 @@ public class Billetera implements IBilletera {
 		inversion.validarCampos();
 		int idInversion = inversion.getIdInversion();
 		cuenta.debitar(monto);
-		
+
 		diccActividadesPorDNI.get(dni).add(inversion);
 		diccActividadesPorCvu.get(cvu).add(inversion);
 		return idInversion;
@@ -270,34 +271,35 @@ public class Billetera implements IBilletera {
 	@Override
 	public void precancelarInversion(String dni, String cvu, int idInversion) {
 		/**
-	     * [Nuevo]
-	     * 13) Precancela una inversión activa de forma anticipada.
-	     * Lanza error si algun dato es inválido, la inversión no existe o no está
-	     * activa.
-	     *
-	     * @param dni         El DNI del usuario.
-	     * @param cvu         El CVU de la cuenta asociada a la inversión.
-	     * @param idInversion El identificador único de la inversión a cancelar.
-	     */
-		
-		// 
-		
+		 * [Nuevo]
+		 * 13) Precancela una inversión activa de forma anticipada.
+		 * Lanza error si algun dato es inválido, la inversión no existe o no está
+		 * activa.
+		 *
+		 * @param dni         El DNI del usuario.
+		 * @param cvu         El CVU de la cuenta asociada a la inversión.
+		 * @param idInversion El identificador único de la inversión a cancelar.
+		 */
+
+		//
+
 		if (!diccUsuariosPorDni.containsKey(dni))
 			throw new IllegalArgumentException("El usuario no está registrado.");
 
 		if (!diccCuentasPorCvu.containsKey(cvu))
 			throw new IllegalArgumentException("La cuenta no existe.");
-		
 
 	}
 
 	@Override
 	public String consultarCvu(String alias) {
-		
-		// podria haber diccAliasPorCvu, no hay un req de que esto debe ser en O(1), por lo que para no extender demasiado las estructuras de datos se implementa asi. Complejidad O(n)
+
+		// podria haber diccAliasPorCvu, no hay un req de que esto debe ser en O(1), por
+		// lo que para no extender demasiado las estructuras de datos se implementa asi.
+		// Complejidad O(n)
 		for (Cuenta cuenta : diccCuentasPorCvu.values())
-		    if (alias.equals(cuenta.getAlias()))
-		        return cuenta.getCvu();
+			if (alias.equals(cuenta.getAlias()))
+				return cuenta.getCvu();
 
 		throw new IllegalArgumentException("el alias no esta registrado");
 	}
@@ -322,18 +324,17 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public double obtenerTotalInvertido(String dniUsuario) {
-	
+
 		if (!diccUsuariosPorDni.containsKey(dniUsuario))
 			throw new IllegalArgumentException("el usuario no existe");
-		
-		
-		double totalInvertido=0;
+
+		double totalInvertido = 0;
 		List<Actividad> listaActividades = diccActividadesPorDNI.get(dniUsuario);
-	
+
 		for (Actividad actividad : listaActividades)
 			if (actividad instanceof Inversion)
 				totalInvertido += actividad.getMonto();
-					
+
 		return totalInvertido;
 	}
 

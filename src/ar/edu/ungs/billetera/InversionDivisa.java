@@ -7,18 +7,15 @@ public class InversionDivisa extends Inversion {
 
     public InversionDivisa(String cvu, double monto, int plazoDias, String divisa, double tasa) {
         super(cvu, monto, plazoDias);
-        this.divisa = divisa;
-        this.tasa = tasa;
-    }
-
-    public void validarCampos() {
-        super.validarCampos();
         if (divisa == null || divisa.trim().isEmpty()) {
             throw new IllegalArgumentException("La divisa no puede estar vacía.");
         }
         if (tasa <= 0) {
             throw new IllegalArgumentException("La tasa debe ser mayor a cero.");
         }
+
+        this.divisa = divisa;
+        this.tasa = tasa;
     }
 
     public double calcularInteres() {
