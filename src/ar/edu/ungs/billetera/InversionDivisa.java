@@ -1,6 +1,6 @@
 package ar.edu.ungs.billetera;
 
-public class InversionDivisa extends Inversion {
+public class InversionDivisa extends InversionPrecancelable {
 
     private String divisa;
     private double tasa;
@@ -35,5 +35,15 @@ public class InversionDivisa extends Inversion {
     public double getTasa() {
         return tasa;
     }
+
+	@Override
+	public double calcularResultado() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	
+    
+    
 
 }

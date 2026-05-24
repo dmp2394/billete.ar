@@ -20,4 +20,10 @@ public class InversionLiquidez extends Inversion {
     public double getActivoFLE() {
         return activoFLE;
     }
+
+	@Override
+	public double calcularResultado() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

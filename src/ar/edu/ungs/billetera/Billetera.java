@@ -287,7 +287,42 @@ public class Billetera implements IBilletera {
 
 		if (!diccCuentasPorCvu.containsKey(cvu))
 			throw new IllegalArgumentException("La cuenta no existe.");
+		
+		if(!existeInversion(idInversion, cvu))
+			throw new IllegalArgumentException("La inversion no existe.");
+		
+		if(!inversionEstaActiva(idInversion,cvu))
+			throw new IllegalArgumentException("La inversion no esta activa.");
 
+//		if(!inversionNoEsPrecancelable(idInversion,cvu))
+//	    	throw new IllegalArgumentException("Esta inversión no es precancelable.");
+		
+		
+		
+		
+
+	}
+	
+	
+	private boolean existeInversion(int idInversion, String cvu) {
+		List<Actividad> actividades = diccActividadesPorCvu.get(cvu);
+		
+		for(Actividad actividad : actividades)
+			if (actividad instanceof Inversion 
+					&& ((Inversion) actividad).getIdInversion() == idInversion)
+				return true;
+		return false;
+	}
+	
+	private boolean inversionEstaActiva(int idInversion, String cvu) {
+		List<Actividad> actividades = diccActividadesPorCvu.get(cvu);
+		
+		for(Actividad actividad : actividades)
+			if (actividad instanceof Inversion 
+					&& ((Inversion) actividad).getIdInversion() == idInversion 
+					&& ((Inversion) actividad).estaActiva())
+				return true;
+		return false;
 	}
 
 	@Override
