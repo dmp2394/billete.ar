@@ -2,7 +2,10 @@ package ar.edu.ungs.billetera;
 
 import java.time.LocalDate;
 
+
 public class Inversion extends Actividad {
+
+	private static int contadorId = 1;
 
     private int plazoDias;
     private int idInversion;
@@ -10,7 +13,7 @@ public class Inversion extends Actividad {
     public Inversion(String cvu, double monto, int plazoDias) {
         super(LocalDate.now(), monto, cvu);
         this.plazoDias = plazoDias;
-        this.idInversion = (int) (Math.random() * 1000000);
+        this.idInversion = contadorId++;
     }
 
     @Override

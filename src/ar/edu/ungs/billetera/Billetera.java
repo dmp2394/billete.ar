@@ -322,8 +322,19 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public double obtenerTotalInvertido(String dniUsuario) {
-		// TODO Auto-generated method stub
-		return 0;
+	
+		if (!diccUsuariosPorDni.containsKey(dniUsuario))
+			throw new IllegalArgumentException("el usuario no existe");
+		
+		
+		double totalInvertido=0;
+		List<Actividad> listaActividades = diccActividadesPorDNI.get(dniUsuario);
+	
+		for (Actividad actividad : listaActividades)
+			if (actividad instanceof Inversion)
+				totalInvertido += actividad.getMonto();
+					
+		return totalInvertido;
 	}
 
 	@Override
