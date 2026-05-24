@@ -271,7 +271,17 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public String consultarCvu(String alias) {
-		// TODO Auto-generated method stub
+		/**
+	     * [Nuevo]
+	     * 14) Dado un alias consultar el CVU asociado.
+	     * Lanza error si el alias no está registrado.
+	     *
+	     * @param alias Alias para consultar el CVU.
+	     * @return cvu asociado al alias. Si el alias no está registrado debe lanzar una
+	     *         excepción.
+	     */
+		
+
 		return null;
 	}
 
