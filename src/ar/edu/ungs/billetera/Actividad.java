@@ -8,12 +8,6 @@ public abstract class Actividad {
     private String cvu;
 
     public Actividad(LocalDate fecha, double monto, String cvu) {
-        this.fecha = fecha;
-        this.monto = monto;
-        this.cvu = cvu;
-    }
-
-    public void validarCampos() {
         if (fecha == null) {
             throw new IllegalArgumentException("La fecha no puede ser nula.");
         }
@@ -23,6 +17,10 @@ public abstract class Actividad {
         if (cvu == null || cvu.trim().isEmpty()) {
             throw new IllegalArgumentException("El CVU no puede estar vacío.");
         }
+
+        this.fecha = fecha;
+        this.monto = monto;
+        this.cvu = cvu;
     }
 
     public LocalDate getFecha() {
@@ -36,8 +34,8 @@ public abstract class Actividad {
     public String getCvu() {
         return cvu;
     }
-    
+
     public void actualizarFecha(LocalDate fecha) {
-    	this.fecha = fecha;
+        this.fecha = fecha;
     }
 }

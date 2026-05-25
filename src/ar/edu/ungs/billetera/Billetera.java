@@ -26,7 +26,7 @@ public class Billetera implements IBilletera {
 	// METODOS PUBLICOS:
 	@Override
 	public String toString() {
-		// TODO: actualizar esto al final
+
 		return ("cantidad de usuarios, empresas, cuentas, etc");
 	}
 
@@ -162,7 +162,6 @@ public class Billetera implements IBilletera {
 			throw new IllegalArgumentException("La cuenta de destino no existe.");
 
 		Transferencia transferencia = new Transferencia(cvuOrigen, cvuDestino, monto);
-		transferencia.validarCampos();
 
 		Cuenta cuentaOrigen = diccCuentasPorCvu.get(cvuOrigen);
 
@@ -199,7 +198,6 @@ public class Billetera implements IBilletera {
 
 		InversionRentaFija inversion = new InversionRentaFija(cvu, monto, plazoDias);
 
-		inversion.validarCampos();
 		int idInversion = inversion.getIdInversion();
 
 		diccActividadesPorDNI.get(dni).add(inversion);
@@ -228,7 +226,6 @@ public class Billetera implements IBilletera {
 
 		InversionDivisa inversion = new InversionDivisa(cvu, monto, plazoDias, divisa, tasa);
 
-		inversion.validarCampos();
 		int idInversion = inversion.getIdInversion();
 
 		diccActividadesPorDNI.get(dni).add(inversion);
@@ -257,18 +254,18 @@ public class Billetera implements IBilletera {
 			throw new IllegalArgumentException("Esta inversion solo puede realizarse desde una Cuenta Corporativa");
 
 		InversionLiquidez inversion = new InversionLiquidez(cvu, monto, plazoDias);
-		inversion.validarCampos();
+
 		int idInversion = inversion.getIdInversion();
 
 		diccActividadesPorDNI.get(dni).add(inversion);
 		diccActividadesPorCvu.get(cvu).add(inversion);
 		diccInversionesPorId.put(idInversion, inversion);
-		
+
 		return idInversion;
 	}
 
-
-	// no hay un diccionario de inversiones, agregarlo esta ok? asi como lo tenemos + diccInversionesPorId
+	// no hay un diccionario de inversiones, agregarlo esta ok? asi como lo tenemos
+	// + diccInversionesPorId
 	public void precancelarInversion(String dni, String cvu, int idInversion) {
 		/**
 		 * [Nuevo]
@@ -286,65 +283,62 @@ public class Billetera implements IBilletera {
 
 		if (!diccCuentasPorCvu.containsKey(cvu))
 			throw new IllegalArgumentException("La cuenta no existe.");
-		
-		if(!existeInversion(idInversion))
+
+		if (!existeInversion(idInversion))
 			throw new IllegalArgumentException("La inversion no existe.");
-		
-		if(!inversionEstaActiva(idInversion))
+
+		if (!inversionEstaActiva(idInversion))
 			throw new IllegalArgumentException("La inversion no esta activa.");
 
-		if(!inversionEsPrecancelable(idInversion))
-	    	throw new IllegalArgumentException("Este tipo de inversión no es precancelable.");
-		
+		if (!inversionEsPrecancelable(idInversion))
+			throw new IllegalArgumentException("Este tipo de inversión no es precancelable.");
+
 		InversionPrecancelable inversion = (InversionPrecancelable) diccInversionesPorId.get(idInversion);
-		
-		// actualizar saldo de la cuenta, paga la mitad de los intereses hasta el momento
+
+		// actualizar saldo de la cuenta, paga la mitad de los intereses hasta el
+		// momento
 		Cuenta cuenta = diccCuentasPorCvu.get(cvu);
-		
-		double interes = inversion.calcularInteres(Utilitarios.hoy())/2;
+
+		double interes = inversion.calcularInteres(Utilitarios.hoy()) / 2;
 		cuenta.acreditar(interes);
-		
+
 		inversion.precancelar();
-		
+
 		// actualizar actividad en:
 		// diccActividadesPorDNI, diccActividadesPorCvu, diccInversionesPorId
 		List<Actividad> actividadesPorDNI = diccActividadesPorDNI.get(dni);
 		List<Actividad> actividadesPorCvu = diccActividadesPorCvu.get(cvu);
-		
-		
+
 		// actualizo los 3 diccionarios a su manera
-		for(int i=0; i<actividadesPorDNI.size(); i++) {
-			if ( actividadesPorDNI instanceof InversionPrecancelable
-				    && ((InversionPrecancelable) actividadesPorDNI.get(i)).getIdInversion() == idInversion) {
+		for (int i = 0; i < actividadesPorDNI.size(); i++) {
+			if (actividadesPorDNI instanceof InversionPrecancelable
+					&& ((InversionPrecancelable) actividadesPorDNI.get(i)).getIdInversion() == idInversion) {
 				actividadesPorDNI.set(i, inversion);
 			}
 		}
-		
-		for(int i=0; i<actividadesPorCvu.size(); i++) {
-			if ( actividadesPorCvu instanceof InversionPrecancelable
-				    && ((InversionPrecancelable) actividadesPorCvu.get(i)).getIdInversion() == idInversion) {
+
+		for (int i = 0; i < actividadesPorCvu.size(); i++) {
+			if (actividadesPorCvu instanceof InversionPrecancelable
+					&& ((InversionPrecancelable) actividadesPorCvu.get(i)).getIdInversion() == idInversion) {
 				actividadesPorCvu.set(i, inversion);
 			}
 		}
-		
+
 		diccInversionesPorId.replace(idInversion, inversion);
-		
+
 	}
-	
 
 	private boolean inversionEsPrecancelable(int idInversion) {
 
 		return (diccInversionesPorId.get(idInversion) instanceof InversionPrecancelable);
 	}
 
-	
-	
 	private boolean existeInversion(int idInversion) {
 		Inversion inversion = diccInversionesPorId.get(idInversion);
-		
-		return inversion!=null ? true : false;
+
+		return inversion != null ? true : false;
 	}
-	
+
 	private boolean inversionEstaActiva(int idInversion) {
 		return diccInversionesPorId.get(idInversion).estaActiva();
 	}
