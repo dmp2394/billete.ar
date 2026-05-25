@@ -37,7 +37,7 @@ public class InversionDivisa extends InversionPrecancelable {
 
 	@Override
 	public double calcularInteres(LocalDate aFecha) {
-        double divisasEquivalente = this.monto / Utilitarios.consultarCotizacion("USD");
+        double divisasEquivalente = this.monto / Utilitarios.consultarCotizacion(this.divisa);
         int dias = (int) ChronoUnit.DAYS.between(this.fecha, aFecha);
         
         return divisasEquivalente * (this.tasa / 365) * dias;
