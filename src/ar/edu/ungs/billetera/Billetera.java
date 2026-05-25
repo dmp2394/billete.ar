@@ -371,8 +371,22 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public List<String> consultarHistorialCuenta(String cvu) {
-		// TODO Auto-generated method stub
-		return null;
+
+		List<Actividad> actividades = diccActividadesPorCvu.get(cvu);
+		
+		if(actividades == null) {
+			return new ArrayList<>();
+		}else {
+			List<String> resultado = new ArrayList<>();
+			
+			for(Actividad actividad : actividades) {
+				resultado.add(actividad.toString());
+			}
+			
+			return resultado;
+		}
+		
+		
 	}
 
 	@Override
