@@ -1,5 +1,6 @@
 package ar.edu.ungs.billetera;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,6 +13,7 @@ public class Billetera implements IBilletera {
 	private HashMap<String, List<Actividad>> diccActividadesPorDNI;
 	private HashMap<String, List<Actividad>> diccActividadesPorCvu;
 	private HashMap<Integer, Inversion> diccInversionesPorId;
+	private List<String> historialGlobal;
 
 	// CONSTRUCTOR. INICIALIZO VARIABLES
 	public Billetera() {
@@ -21,6 +23,7 @@ public class Billetera implements IBilletera {
 		this.diccActividadesPorDNI = new HashMap<>();
 		this.diccActividadesPorCvu = new HashMap<>();
 		this.diccInversionesPorId = new HashMap<>();
+		this.historialGlobal = new ArrayList<>();
 	}
 
 	// METODOS PUBLICOS:
@@ -177,6 +180,9 @@ public class Billetera implements IBilletera {
 		diccActividadesPorDNI.get(cuentaDestino.getDniUsuario()).add(transferencia);
 		diccActividadesPorCvu.get(cvuOrigen).add(transferencia);
 		diccActividadesPorCvu.get(cvuDestino).add(transferencia);
+		
+		// Registrar en historial global
+	    historialGlobal.add("Transferencia de " + monto + " desde " + cvuOrigen + " hacia " + cvuDestino);
 
 	}
 
@@ -359,8 +365,8 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public List<String> consultarHistorialGlobal() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return historialGlobal;
 	}
 
 	@Override
