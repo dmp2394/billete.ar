@@ -311,7 +311,7 @@ public class Billetera implements IBilletera {
 
 		cuenta.acreditar(interes);
 
-		inversion.precancelar();
+		inversion.precancelar(Utilitarios.hoy());
 
 		// actualizar actividad en:
 		// diccActividadesPorDNI, diccActividadesPorCvu, diccInversionesPorId
