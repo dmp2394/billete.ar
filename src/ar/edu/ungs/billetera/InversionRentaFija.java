@@ -17,7 +17,7 @@ public class InversionRentaFija extends InversionPrecancelable {
     public double calcularInteres(LocalDate aFecha) {
   	
     	int dias = (int) ChronoUnit.DAYS.between(this.fecha, aFecha);
-    	return this.monto * (TASA_INTERES_TNA/365) * dias;
+    	return (this.monto * (TASA_INTERES_TNA/365) * dias)/2;
     }
     
     

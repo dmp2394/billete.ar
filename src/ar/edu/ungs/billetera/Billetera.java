@@ -298,8 +298,9 @@ public class Billetera implements IBilletera {
 		// actualizar saldo de la cuenta, paga la mitad de los intereses hasta el
 		// momento
 		Cuenta cuenta = diccCuentasPorCvu.get(cvu);
+	
+		double interes = inversion.calcularInteres(Utilitarios.hoy());
 
-		double interes = inversion.calcularInteres(Utilitarios.hoy()) / 2;
 		cuenta.acreditar(interes);
 
 		inversion.precancelar();

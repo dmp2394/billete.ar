@@ -41,6 +41,10 @@ public class InversionDivisa extends InversionPrecancelable {
         int dias = (int) ChronoUnit.DAYS.between(this.fecha, aFecha);
         
         return divisasEquivalente * (this.tasa / 365) * dias;
+        
+        
+        
+        
 	}
 
 	
