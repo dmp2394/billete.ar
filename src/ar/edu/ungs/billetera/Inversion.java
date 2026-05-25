@@ -22,7 +22,8 @@ public abstract class Inversion extends Actividad {
         this.fecha = Utilitarios.hoy();
     }
 
-    public int getIdInversion() {
+
+	public int getIdInversion() {
         return idInversion; // Retornar el ID almacenado
     }
 

@@ -227,10 +227,12 @@ public class Billetera implements IBilletera {
 		if (!cuenta.getDniUsuario().equals(dni))
 			throw new IllegalArgumentException("La cuenta no pertenece al usuario.");
 
-		if (cuenta.getSaldo() < monto)
+		double montoDivisaEquivalente = monto / Utilitarios.consultarCotizacion(divisa); 
+		
+		if (cuenta.getSaldo() < montoDivisaEquivalente)
 			throw new IllegalArgumentException("Saldo insuficiente para realizar la inversión.");
 
-		InversionDivisa inversion = new InversionDivisa(cvu, monto, plazoDias, divisa, tasa);
+		InversionDivisa inversion = new InversionDivisa(cvu, montoDivisaEquivalente, plazoDias, divisa, tasa);
 
 		int idInversion = inversion.getIdInversion();
 
