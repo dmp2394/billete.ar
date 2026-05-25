@@ -385,14 +385,24 @@ public class Billetera implements IBilletera {
 			
 			return resultado;
 		}
-		
-		
 	}
 
 	@Override
 	public List<String> consultarHistorialUsuario(String dniUsuario) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		List<Actividad> actividades = diccActividadesPorDNI.get(dniUsuario);
+		
+		if(actividades == null) {
+			return new ArrayList<>();
+		}else {
+			List<String> resultado = new ArrayList<>();
+			
+			for(Actividad actividad : actividades) {
+				resultado.add(actividad.toString());
+			}
+			
+			return resultado;
+		}
 	}
 
 	@Override
