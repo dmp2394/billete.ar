@@ -3,7 +3,7 @@ package ar.edu.ungs.billetera;
 import java.time.LocalDate;
 
 public abstract class Actividad {
-    private LocalDate fecha;
+    protected LocalDate fecha;
     protected double monto;
     private String cvu;
 
@@ -35,5 +35,9 @@ public abstract class Actividad {
 
     public String getCvu() {
         return cvu;
+    }
+    
+    public void actualizarFecha(LocalDate fecha) {
+    	this.fecha = fecha;
     }
 }

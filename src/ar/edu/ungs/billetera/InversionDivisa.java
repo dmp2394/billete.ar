@@ -1,5 +1,8 @@
 package ar.edu.ungs.billetera;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
 public class InversionDivisa extends InversionPrecancelable {
 
     private String divisa;
@@ -18,16 +21,6 @@ public class InversionDivisa extends InversionPrecancelable {
         this.tasa = tasa;
     }
 
-    public double calcularInteres() {
-        double cotizacion = Utilitarios.consultarCotizacion(getCvu());
-        return getMonto() * cotizacion * tasa * getPlazoDias() / 365;
-    }
-
-    public double precancelar() {
-        double interesGenerado = calcularInteres();
-        return getMonto() + (interesGenerado / 2);
-    }
-
     public String getDivisa() {
         return divisa;
     }
@@ -40,6 +33,14 @@ public class InversionDivisa extends InversionPrecancelable {
 	public double calcularResultado() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public double calcularInteres(LocalDate aFecha) {
+        double divisasEquivalente = this.monto / Utilitarios.consultarCotizacion("USD");
+        int dias = (int) ChronoUnit.DAYS.between(this.fecha, aFecha);
+        
+        return divisasEquivalente * (this.tasa / 365) * dias;
 	}
 
 	

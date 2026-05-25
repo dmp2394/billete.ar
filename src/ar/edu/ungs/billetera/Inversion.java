@@ -7,16 +7,16 @@ public abstract class Inversion extends Actividad {
 
     private static int contadorId = 1;
 
-    private int plazoDias;
+    protected int plazoDias;
     private int idInversion;
-    private boolean estaActiva;
-
+    protected boolean activa;
 
     public Inversion(String cvu, double monto, int plazoDias) {
         super(LocalDate.now(), monto, cvu);
         this.plazoDias = plazoDias;
         this.idInversion = contadorId++;
-        this.estaActiva = true;
+        this.activa = true;
+        this.fecha = Utilitarios.hoy();
     }
 
     @Override
@@ -26,13 +26,7 @@ public abstract class Inversion extends Actividad {
             throw new IllegalArgumentException("El plazo en días debe ser mayor a cero.");
         }
 
-        this.plazoDias = plazoDias;
         this.idInversion = contadorId++;
-    }
-
-    public double calcularInteres() {
-        double cotizacion = Utilitarios.consultarCotizacion(getCvu());
-        return getMonto() * cotizacion * plazoDias / 365;
     }
 
     public int getIdInversion() {
@@ -44,8 +38,10 @@ public abstract class Inversion extends Actividad {
     }
     
     public boolean estaActiva() {
-    	return this.estaActiva;
+    	return this.activa;
     }
        
     public abstract double calcularResultado();
+    
+
 }

@@ -11,6 +11,7 @@ public class Billetera implements IBilletera {
 	private HashMap<String, Cuenta> diccCuentasPorCvu;
 	private HashMap<String, List<Actividad>> diccActividadesPorDNI;
 	private HashMap<String, List<Actividad>> diccActividadesPorCvu;
+	private HashMap<Integer, Inversion> diccInversionesPorId;
 
 	// CONSTRUCTOR. INICIALIZO VARIABLES
 	public Billetera() {
@@ -19,6 +20,7 @@ public class Billetera implements IBilletera {
 		this.diccCuentasPorCvu = new HashMap<>();
 		this.diccActividadesPorDNI = new HashMap<>();
 		this.diccActividadesPorCvu = new HashMap<>();
+		this.diccInversionesPorId = new HashMap<>();
 	}
 
 	// METODOS PUBLICOS:
@@ -89,7 +91,6 @@ public class Billetera implements IBilletera {
 	public String crearCuentaPremium(String dniUsuario, String alias, double depositoInicial) {
 
 		CuentaPremium cuentaPremium = new CuentaPremium(dniUsuario, alias, depositoInicial);
-		// cuentaPremium.validarCamposPublico();
 
 		if (!diccUsuariosPorDni.containsKey(dniUsuario))
 			throw new IllegalArgumentException("el usuario no esta registrado");
@@ -108,7 +109,7 @@ public class Billetera implements IBilletera {
 	public String crearCuentaCorporativa(String dniUsuario, String alias, String cuitEmpresa) {
 
 		CuentaCorporativa cuentaCorporativa = new CuentaCorporativa(dniUsuario, alias, cuitEmpresa);
-		// cuentaCorporativa.validarCamposPublico();
+
 		if (!diccUsuariosPorDni.containsKey(dniUsuario))
 			throw new IllegalArgumentException("el usuario no esta registrado");
 		if (diccCuentasPorCvu.containsKey(alias))
@@ -201,10 +202,9 @@ public class Billetera implements IBilletera {
 		inversion.validarCampos();
 		int idInversion = inversion.getIdInversion();
 
-		cuenta.debitar(monto);
-
 		diccActividadesPorDNI.get(dni).add(inversion);
 		diccActividadesPorCvu.get(cvu).add(inversion);
+		diccInversionesPorId.put(idInversion, inversion);
 
 		return idInversion;
 
@@ -231,10 +231,9 @@ public class Billetera implements IBilletera {
 		inversion.validarCampos();
 		int idInversion = inversion.getIdInversion();
 
-		cuenta.debitar(monto);
-
 		diccActividadesPorDNI.get(dni).add(inversion);
 		diccActividadesPorCvu.get(cvu).add(inversion);
+		diccInversionesPorId.put(idInversion, inversion);
 
 		return idInversion;
 	}
@@ -260,14 +259,16 @@ public class Billetera implements IBilletera {
 		InversionLiquidez inversion = new InversionLiquidez(cvu, monto, plazoDias);
 		inversion.validarCampos();
 		int idInversion = inversion.getIdInversion();
-		cuenta.debitar(monto);
 
 		diccActividadesPorDNI.get(dni).add(inversion);
 		diccActividadesPorCvu.get(cvu).add(inversion);
+		diccInversionesPorId.put(idInversion, inversion);
+		
 		return idInversion;
 	}
 
-	@Override
+
+	// no hay un diccionario de inversiones, agregarlo esta ok? asi como lo tenemos + diccInversionesPorId
 	public void precancelarInversion(String dni, String cvu, int idInversion) {
 		/**
 		 * [Nuevo]
@@ -280,49 +281,72 @@ public class Billetera implements IBilletera {
 		 * @param idInversion El identificador único de la inversión a cancelar.
 		 */
 
-		//
-
 		if (!diccUsuariosPorDni.containsKey(dni))
 			throw new IllegalArgumentException("El usuario no está registrado.");
 
 		if (!diccCuentasPorCvu.containsKey(cvu))
 			throw new IllegalArgumentException("La cuenta no existe.");
 		
-		if(!existeInversion(idInversion, cvu))
+		if(!existeInversion(idInversion))
 			throw new IllegalArgumentException("La inversion no existe.");
 		
-		if(!inversionEstaActiva(idInversion,cvu))
+		if(!inversionEstaActiva(idInversion))
 			throw new IllegalArgumentException("La inversion no esta activa.");
 
-//		if(!inversionNoEsPrecancelable(idInversion,cvu))
-//	    	throw new IllegalArgumentException("Esta inversión no es precancelable.");
+		if(!inversionEsPrecancelable(idInversion))
+	    	throw new IllegalArgumentException("Este tipo de inversión no es precancelable.");
+		
+		InversionPrecancelable inversion = (InversionPrecancelable) diccInversionesPorId.get(idInversion);
+		
+		// actualizar saldo de la cuenta, paga la mitad de los intereses hasta el momento
+		Cuenta cuenta = diccCuentasPorCvu.get(cvu);
+		
+		double interes = inversion.calcularInteres(Utilitarios.hoy())/2;
+		cuenta.acreditar(interes);
+		
+		inversion.precancelar();
+		
+		// actualizar actividad en:
+		// diccActividadesPorDNI, diccActividadesPorCvu, diccInversionesPorId
+		List<Actividad> actividadesPorDNI = diccActividadesPorDNI.get(dni);
+		List<Actividad> actividadesPorCvu = diccActividadesPorCvu.get(cvu);
 		
 		
+		// actualizo los 3 diccionarios a su manera
+		for(int i=0; i<actividadesPorDNI.size(); i++) {
+			if ( actividadesPorDNI instanceof InversionPrecancelable
+				    && ((InversionPrecancelable) actividadesPorDNI.get(i)).getIdInversion() == idInversion) {
+				actividadesPorDNI.set(i, inversion);
+			}
+		}
 		
+		for(int i=0; i<actividadesPorCvu.size(); i++) {
+			if ( actividadesPorCvu instanceof InversionPrecancelable
+				    && ((InversionPrecancelable) actividadesPorCvu.get(i)).getIdInversion() == idInversion) {
+				actividadesPorCvu.set(i, inversion);
+			}
+		}
 		
+		diccInversionesPorId.replace(idInversion, inversion);
+		
+	}
+	
 
+	private boolean inversionEsPrecancelable(int idInversion) {
+
+		return (diccInversionesPorId.get(idInversion) instanceof InversionPrecancelable);
+	}
+
+	
+	
+	private boolean existeInversion(int idInversion) {
+		Inversion inversion = diccInversionesPorId.get(idInversion);
+		
+		return inversion!=null ? true : false;
 	}
 	
-	
-	private boolean existeInversion(int idInversion, String cvu) {
-		List<Actividad> actividades = diccActividadesPorCvu.get(cvu);
-		
-		for(Actividad actividad : actividades)
-			if (actividad instanceof Inversion 
-					&& ((Inversion) actividad).getIdInversion() == idInversion)
-				return true;
-		return false;
-	}
-	
-	private boolean inversionEstaActiva(int idInversion, String cvu) {
-		List<Actividad> actividades = diccActividadesPorCvu.get(cvu);
-		
-		for(Actividad actividad : actividades)
-			if (actividad instanceof Inversion 
-					&& ((Inversion) actividad).getIdInversion() == idInversion 
-					&& ((Inversion) actividad).estaActiva())
-				return true;
-		return false;
+	private boolean inversionEstaActiva(int idInversion) {
+		return diccInversionesPorId.get(idInversion).estaActiva();
 	}
 
 	@Override
