@@ -311,7 +311,7 @@ public class Billetera implements IBilletera {
 
 		cuenta.acreditar(interes);
 
-		inversion.precancelar(Utilitarios.hoy());
+		//inversion.precancelar(Utilitarios.hoy());
 
 		// actualizar actividad en:
 		// diccActividadesPorDNI, diccActividadesPorCvu, diccInversionesPorId
@@ -425,8 +425,30 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public List<String> cuentasConMayorVolumen(int cantidadTop) {
-		// TODO Auto-generated method stub
-		return null;
+
+		List<String> resultado = new ArrayList<>();
+		List<String> cvus = new ArrayList<>(diccActividadesPorCvu.keySet()); //guardamos cvus
+		
+		for (int i= 0; i < cantidadTop; i++) {
+			
+			String cvuMayor = cvus.get(0); //iniciamos en primer valor
+			
+			for (String cvu : cvus) {
+				
+				int valor1 = diccActividadesPorCvu.get(cvu).size(); //guardamos cuantas act tiene el cvu
+				int valor2 = diccActividadesPorCvu.get(cvuMayor).size();
+				
+				if (valor1 > valor2) {
+					cvuMayor = cvu;
+				}
+			}
+			
+			resultado.add(cvuMayor); //guardamos el mas grande
+			
+			cvus.remove(cvuMayor); //se elimina para buscar el sig más grande
+		}
+		
+		return resultado;
 	}
 
 	// METODOS PRIVADOS
