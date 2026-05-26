@@ -6,6 +6,9 @@ import java.util.List;
 
 public class Billetera implements IBilletera {
 
+	// TODO: INFORME, PUNTO BONUS, TAREA DE COMPLEJIDAD, SUMAR TESTS, REGISTRAR HISTORIAL EN DONDE FALTE, USAR STRINGBUILDER,
+	// REVISAR toString DE BILLETERA Y DERIVADOS 
+	
 	// ATRIBUTOS
 	private HashMap<String, Empresa> diccEmpresasPorCuit;
 	private HashMap<String, Usuario> diccUsuariosPorDni;
