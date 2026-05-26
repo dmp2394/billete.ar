@@ -9,14 +9,7 @@ public abstract class InversionPrecancelable extends Inversion {
 		super(cvu, monto, plazoDias);
 	}
 	
-
-	public void precancelar() {
-    	// al precancelar el monto de esta inversion desaparece
-    	this.monto = 0;
-    	this.actualizarFecha(Utilitarios.hoy());
-    	
-    	
-    }
+	public abstract double precancelar();
     
-    public abstract double calcularInteres(LocalDate localDate);
+	protected abstract double calcularInteres();
 }

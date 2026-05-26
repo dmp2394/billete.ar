@@ -14,17 +14,32 @@ public class InversionRentaFija extends InversionPrecancelable {
 
 
     
-    public double calcularInteres(LocalDate aFecha) {
+    protected double calcularInteres() {
   	
-    	int dias = (int) ChronoUnit.DAYS.between(this.fecha, aFecha);
-    	return (this.monto * (TASA_INTERES_TNA/365) * dias)/2;
+    	int dias = (int) ChronoUnit.DAYS.between(this.fecha, Utilitarios.hoy());
+    	return (this.monto * (TASA_INTERES_TNA/365) * dias);
     }
     
     
 	public double calcularResultado() {
-
-		return 0;
+		double montoAAcreditar = (this.monto + this.calcularInteres());
+		
+		this.finalizar();    	
+    	
+    	return montoAAcreditar;
 	}
+
+
+
+	@Override
+	public double precancelar() {
+		double montoAAcreditar = (this.monto + this.calcularInteres()/2);
+		
+		this.finalizar();    	
+    	
+    	return montoAAcreditar;
+	}
+
 
 
 }

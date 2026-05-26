@@ -7,6 +7,7 @@ public class InversionDivisa extends InversionPrecancelable {
 
     private String divisa;
     private double tasa;
+    private double divisaEquivalente;
 
     public InversionDivisa(String cvu, double monto, int plazoDias, String divisa, double tasa) {
         super(cvu, monto, plazoDias);
@@ -19,6 +20,7 @@ public class InversionDivisa extends InversionPrecancelable {
 
         this.divisa = divisa;
         this.tasa = tasa;
+        this.divisaEquivalente = this.monto / Utilitarios.consultarCotizacion(this.divisa);
     }
 
     public String getDivisa() {
@@ -29,22 +31,28 @@ public class InversionDivisa extends InversionPrecancelable {
         return tasa;
     }
 
+	
+	@Override
+	protected double calcularInteres() {
+        int dias = (int) ChronoUnit.DAYS.between(this.fecha, Utilitarios.hoy());
+        
+        return this.divisaEquivalente * (this.tasa / 365) * dias;
+        
+	}
+	
 	@Override
 	public double calcularResultado() {
-		// TODO Auto-generated method stub
-		return 0;
+		double montoAAcreditar = (this.divisaEquivalente + calcularInteres()) * Utilitarios.consultarCotizacion(this.divisa);
+		this.finalizar();
+		
+    	return montoAAcreditar;
 	}
-
-	@Override
-	public double calcularInteres(LocalDate aFecha) {
-        double divisasEquivalente = this.monto / Utilitarios.consultarCotizacion(this.divisa);
-        int dias = (int) ChronoUnit.DAYS.between(this.fecha, aFecha);
-        
-        return divisasEquivalente * (this.tasa / 365) * dias;
-        
-        
-        
-        
+	
+	public double precancelar() {
+		double montoAAcreditar = (this.divisaEquivalente + calcularInteres()/2) * Utilitarios.consultarCotizacion(this.divisa);
+		this.finalizar();
+    	
+    	return montoAAcreditar;
 	}
 
 	

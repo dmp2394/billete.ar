@@ -36,5 +36,10 @@ public abstract class Inversion extends Actividad {
     }
 
     public abstract double calcularResultado();
+    
+    protected void finalizar() {
+    	this.actualizarFecha(Utilitarios.hoy());
+    	this.activa=false;
+	}
 
 }

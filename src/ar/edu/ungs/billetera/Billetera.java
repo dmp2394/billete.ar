@@ -203,7 +203,10 @@ public class Billetera implements IBilletera {
 			throw new IllegalArgumentException("Saldo insuficiente para realizar la inversión.");
 
 		InversionRentaFija inversion = new InversionRentaFija(cvu, monto, plazoDias);
-
+		
+		cuenta.debitar(monto);
+		diccCuentasPorCvu.replace(cvu, cuenta);
+		
 		int idInversion = inversion.getIdInversion();
 
 		diccActividadesPorDNI.get(dni).add(inversion);
@@ -226,14 +229,15 @@ public class Billetera implements IBilletera {
 		Cuenta cuenta = diccCuentasPorCvu.get(cvu);
 		if (!cuenta.getDniUsuario().equals(dni))
 			throw new IllegalArgumentException("La cuenta no pertenece al usuario.");
-
-		double montoDivisaEquivalente = monto / Utilitarios.consultarCotizacion(divisa); 
-		
-		if (cuenta.getSaldo() < montoDivisaEquivalente)
+	
+		if (cuenta.getSaldo() < monto)
 			throw new IllegalArgumentException("Saldo insuficiente para realizar la inversión.");
 
-		InversionDivisa inversion = new InversionDivisa(cvu, montoDivisaEquivalente, plazoDias, divisa, tasa);
+		InversionDivisa inversion = new InversionDivisa(cvu, monto, plazoDias, divisa, tasa);
 
+		cuenta.debitar(monto);
+		diccCuentasPorCvu.replace(cvu, cuenta);
+		
 		int idInversion = inversion.getIdInversion();
 
 		diccActividadesPorDNI.get(dni).add(inversion);
@@ -263,6 +267,9 @@ public class Billetera implements IBilletera {
 
 		InversionLiquidez inversion = new InversionLiquidez(cvu, monto, plazoDias);
 
+		cuenta.debitar(monto);
+		diccCuentasPorCvu.replace(cvu, cuenta);
+		
 		int idInversion = inversion.getIdInversion();
 
 		diccActividadesPorDNI.get(dni).add(inversion);
@@ -307,11 +314,11 @@ public class Billetera implements IBilletera {
 		// momento
 		Cuenta cuenta = diccCuentasPorCvu.get(cvu);
 	
-		double interes = inversion.calcularInteres(Utilitarios.hoy());
+		// cuenta.debitar(inversion.monto);
 
-		cuenta.acreditar(interes);
-
-		inversion.precancelar(Utilitarios.hoy());
+		double montoInvertidoMasIntereses = inversion.precancelar();
+		
+		cuenta.acreditar(montoInvertidoMasIntereses);
 
 		// actualizar actividad en:
 		// diccActividadesPorDNI, diccActividadesPorCvu, diccInversionesPorId
@@ -320,14 +327,14 @@ public class Billetera implements IBilletera {
 
 		// actualizo los 3 diccionarios a su manera
 		for (int i = 0; i < actividadesPorDNI.size(); i++) {
-			if (actividadesPorDNI instanceof InversionPrecancelable
+			if (actividadesPorDNI.get(i) instanceof InversionPrecancelable
 					&& ((InversionPrecancelable) actividadesPorDNI.get(i)).getIdInversion() == idInversion) {
 				actividadesPorDNI.set(i, inversion);
 			}
 		}
 
 		for (int i = 0; i < actividadesPorCvu.size(); i++) {
-			if (actividadesPorCvu instanceof InversionPrecancelable
+			if (actividadesPorCvu.get(i) instanceof InversionPrecancelable
 					&& ((InversionPrecancelable) actividadesPorCvu.get(i)).getIdInversion() == idInversion) {
 				actividadesPorCvu.set(i, inversion);
 			}
@@ -417,7 +424,7 @@ public class Billetera implements IBilletera {
 		List<Actividad> listaActividades = diccActividadesPorDNI.get(dniUsuario);
 
 		for (Actividad actividad : listaActividades)
-			if (actividad instanceof Inversion)
+			if (actividad instanceof Inversion && ((Inversion) actividad).estaActiva())
 				totalInvertido += actividad.getMonto();
 
 		return totalInvertido;
