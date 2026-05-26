@@ -6,8 +6,13 @@ import java.util.List;
 
 public class Billetera implements IBilletera {
 
-	// TODO: INFORME, PUNTO BONUS, TAREA DE COMPLEJIDAD, SUMAR TESTS, REGISTRAR HISTORIAL EN DONDE FALTE, USAR STRINGBUILDER,
+	// TODO: INFORME, PUNTO BONUS, TAREA DE COMPLEJIDAD, SUMAR TESTS, 
+	// REGISTRAR HISTORIAL EN DONDE FALTE, USAR STRINGBUILDER,
 	// REVISAR toString DE BILLETERA Y DERIVADOS 
+	//
+	// debitar saldo al invertir?
+	// que se supone que deberia hacer calcularResultado? lo que corrigio el profesor. Devuelve el total y finaliza la inversion? o sea monto + interés y pone estado inactivo
+	// esta bien como calculamos el interes del fondo de liquidez? igual que renta fija pero con otra tasa
 	
 	// ATRIBUTOS
 	private HashMap<String, Empresa> diccEmpresasPorCuit;
@@ -285,17 +290,7 @@ public class Billetera implements IBilletera {
 	// no hay un diccionario de inversiones, agregarlo esta ok? asi como lo tenemos
 	// + diccInversionesPorId
 	public void precancelarInversion(String dni, String cvu, int idInversion) {
-		/**
-		 * [Nuevo]
-		 * 13) Precancela una inversión activa de forma anticipada.
-		 * Lanza error si algun dato es inválido, la inversión no existe o no está
-		 * activa.
-		 *
-		 * @param dni         El DNI del usuario.
-		 * @param cvu         El CVU de la cuenta asociada a la inversión.
-		 * @param idInversion El identificador único de la inversión a cancelar.
-		 */
-
+		
 		if (!diccUsuariosPorDni.containsKey(dni))
 			throw new IllegalArgumentException("El usuario no está registrado.");
 
@@ -317,16 +312,22 @@ public class Billetera implements IBilletera {
 		// momento
 		Cuenta cuenta = diccCuentasPorCvu.get(cvu);
 	
-		// cuenta.debitar(inversion.monto);
-
 		double montoInvertidoMasIntereses = inversion.precancelar();
 		
 		cuenta.acreditar(montoInvertidoMasIntereses);
 
+		// actualizar historial
+		actualizarHistorial(idInversion, dni, cvu);
+
+	}
+	
+	
+	private void actualizarHistorial(int idInversion, String dni, String cvu) {
 		// actualizar actividad en:
 		// diccActividadesPorDNI, diccActividadesPorCvu, diccInversionesPorId
 		List<Actividad> actividadesPorDNI = diccActividadesPorDNI.get(dni);
 		List<Actividad> actividadesPorCvu = diccActividadesPorCvu.get(cvu);
+		Inversion inversion = diccInversionesPorId.get(idInversion);
 
 		// actualizo los 3 diccionarios a su manera
 		for (int i = 0; i < actividadesPorDNI.size(); i++) {
@@ -344,8 +345,38 @@ public class Billetera implements IBilletera {
 		}
 
 		diccInversionesPorId.replace(idInversion, inversion);
-
+		
 	}
+
+	public void procesarInversionesQueVencenHoy() {
+		 /**
+	     * [Bonus Track]
+	     * 15) Procesa todas las inversiones que vencen el dia de hoy
+	     * y actualiza los saldos agregando los intereses generados segun el tipo de
+	     * inversion.
+	     * Sea por taza fija o por cotización de activos más tasa.
+	     * 
+	     * El dia actual y las cotizaciones de los activos se deben consultar a
+	     * Utilitarios.
+	     * 
+	     */
+		for (Inversion inversion : diccInversionesPorId.values()) {
+			if (inversion.venceHoy()) {
+				double montoInvertidoMasIntereses = inversion.calcularResultado();
+				
+				// Buscar la cuenta para acreditar
+				cuenta.acreditar(montoInvertidoMasIntereses);
+				
+				String dni = 
+				String cvu = 
+				// actualizar historial
+				actualizarHistorial(idInversion, dni, cvu);
+			}
+		}
+		
+	}
+	
+	
 
 	private boolean inversionEsPrecancelable(int idInversion) {
 
@@ -489,5 +520,6 @@ public class Billetera implements IBilletera {
 			throw new IllegalArgumentException("El nombre de contacto no puede ser vacio o no tener caracteres");
 
 	}
+
 
 }
