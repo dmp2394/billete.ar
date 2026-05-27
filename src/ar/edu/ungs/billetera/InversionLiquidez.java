@@ -4,27 +4,31 @@ import java.time.temporal.ChronoUnit;
 
 public class InversionLiquidez extends Inversion {
 
-    final double TASA_ACTIVO_FLE = 0.08; // tasa sujeta a un activo particular (fijo) del 8%
+	final double TASA_ACTIVO_FLE = 0.08; // tasa sujeta a un activo particular (fijo) del 8%
 
-    public InversionLiquidez(String cvu, double monto, int plazoDias) {
-        super(cvu, monto, plazoDias);
-    }
+	public InversionLiquidez(String cvu, double monto, int plazoDias) {
+		super(cvu, monto, plazoDias);
+	}
 
+	protected double calcularInteres() {
 
-    protected double calcularInteres() {
-      	
-    	int dias = (int) ChronoUnit.DAYS.between(this.fecha, Utilitarios.hoy());
-    	return (this.monto * (TASA_ACTIVO_FLE/365) * dias);
-    }
-    
+		int dias = (int) ChronoUnit.DAYS.between(this.fecha, Utilitarios.hoy());
+		return (this.monto * (TASA_ACTIVO_FLE / 365) * dias);
+	}
+
 	@Override
 	public double calcularResultado() {
 		double montoAAcreditar = (this.monto + this.calcularInteres());
-		
-		this.finalizar();    	
-    	
-    	return montoAAcreditar;
+
+		this.finalizar();
+
+		return montoAAcreditar;
 	}
-	
+
+	public String toString() {
+		return "InversionLiquidez [TASA_ACTIVO_FLE=" + TASA_ACTIVO_FLE + ", plazoDias=" + plazoDias
+				+ ", idInversion=" + getIdInversion() + ", activa=" + estaActiva() + ", fecha=" + fecha + ", monto="
+				+ monto + ", cvu=" + getCvu() + "]";
+	}
 
 }

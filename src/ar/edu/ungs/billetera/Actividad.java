@@ -48,4 +48,8 @@ public abstract class Actividad {
     public void actualizarFecha(LocalDate fecha) {
         this.fecha = fecha;
     }
+
+    public String toString() {
+        return "Actividad [fecha=" + fecha + ", monto=" + monto + ", cvu=" + cvu + ", estado=" + estado + "]";
+    }
 }

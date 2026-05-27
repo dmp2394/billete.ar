@@ -34,4 +34,10 @@ public class InversionRentaFija extends InversionPrecancelable {
 		return montoAAcreditar;
 	}
 
+	public String toString() {
+		return "InversionRentaFija [TASA_INTERES_TNA=" + TASA_INTERES_TNA + ", plazoDias=" + plazoDias
+				+ ", idInversion=" + getIdInversion() + ", activa=" + estaActiva() + ", fecha=" + fecha
+				+ ", monto=" + monto + ", cvu=" + getCvu() + "]";
+	}
+
 }

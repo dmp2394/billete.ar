@@ -1,6 +1,5 @@
 package ar.edu.ungs.billetera;
 
-
 public class Transferencia extends Actividad {
     private String cvuDestino;
 
@@ -15,6 +14,11 @@ public class Transferencia extends Actividad {
 
     public String getCvuDestino() {
         return cvuDestino;
+    }
+
+    public String toString() {
+        return "Transferencia [fecha=" + getFecha() + ", monto=" + getMonto() + ", cvuOrigen=" + getCvu()
+                + ", cvuDestino=" + cvuDestino + ", estado=" + getEstado() + "]";
     }
 
 }
