@@ -1,6 +1,6 @@
 package ar.edu.ungs.billetera;
 
-import java.time.LocalDate;
+//import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 public class InversionDivisa extends InversionPrecancelable {
@@ -31,32 +31,29 @@ public class InversionDivisa extends InversionPrecancelable {
         return tasa;
     }
 
-	
-	@Override
-	protected double calcularInteres() {
+    @Override
+    protected double calcularInteres() {
         int dias = (int) ChronoUnit.DAYS.between(this.fecha, Utilitarios.hoy());
-        
-        return this.divisaEquivalente * (this.tasa / 365) * dias;
-        
-	}
-	
-	@Override
-	public double calcularResultado() {
-		double montoAAcreditar = (this.divisaEquivalente + calcularInteres()) * Utilitarios.consultarCotizacion(this.divisa);
-		this.finalizar();
-		
-    	return montoAAcreditar;
-	}
-	
-	public double precancelar() {
-		double montoAAcreditar = (this.divisaEquivalente + calcularInteres()/2) * Utilitarios.consultarCotizacion(this.divisa);
-		this.finalizar();
-    	
-    	return montoAAcreditar;
-	}
 
-	
-    
-    
+        return this.divisaEquivalente * (this.tasa / 365) * dias;
+
+    }
+
+    @Override
+    public double calcularResultado() {
+        double montoAAcreditar = (this.divisaEquivalente + calcularInteres())
+                * Utilitarios.consultarCotizacion(this.divisa);
+        this.finalizar();
+
+        return montoAAcreditar;
+    }
+
+    public double precancelar() {
+        double montoAAcreditar = (this.divisaEquivalente + calcularInteres() / 2)
+                * Utilitarios.consultarCotizacion(this.divisa);
+        this.finalizar();
+
+        return montoAAcreditar;
+    }
 
 }

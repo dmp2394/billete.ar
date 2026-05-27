@@ -7,14 +7,17 @@ import java.util.List;
 public class Billetera implements IBilletera {
 
 	private static final double MONTO_MINIMO_FLE = 20000000;
-	// TODO: INFORME, PUNTO BONUS, TAREA DE COMPLEJIDAD, SUMAR TESTS, 
+	// TODO: INFORME, PUNTO BONUS, TAREA DE COMPLEJIDAD, SUMAR TESTS,
 	// REGISTRAR HISTORIAL EN DONDE FALTE, USAR STRINGBUILDER,
-	// REVISAR toString DE BILLETERA Y DERIVADOS 
+	// REVISAR toString DE BILLETERA Y DERIVADOS
 	//
 	// debitar saldo al invertir?
-	// que se supone que deberia hacer calcularResultado? lo que corrigio el profesor. Devuelve el total y finaliza la inversion? o sea monto + interés y pone estado inactivo
-	// esta bien como calculamos el interes del fondo de liquidez? igual que renta fija pero con otra tasa
-	
+	// que se supone que deberia hacer calcularResultado? lo que corrigio el
+	// profesor. Devuelve el total y finaliza la inversion? o sea monto + interés y
+	// pone estado inactivo
+	// esta bien como calculamos el interes del fondo de liquidez? igual que renta
+	// fija pero con otra tasa
+
 	// ATRIBUTOS
 	private HashMap<String, Empresa> diccEmpresasPorCuit;
 	private HashMap<String, Usuario> diccUsuariosPorDni;
@@ -22,7 +25,7 @@ public class Billetera implements IBilletera {
 	private HashMap<String, List<Actividad>> diccActividadesPorDNI;
 	private HashMap<String, List<Actividad>> diccActividadesPorCvu;
 	private HashMap<Integer, Inversion> diccInversionesPorId;
-	private List<String> historialGlobal;
+	// private List<String> historialGlobal;
 
 	// CONSTRUCTOR. INICIALIZO VARIABLES
 	public Billetera() {
@@ -32,7 +35,7 @@ public class Billetera implements IBilletera {
 		this.diccActividadesPorDNI = new HashMap<>();
 		this.diccActividadesPorCvu = new HashMap<>();
 		this.diccInversionesPorId = new HashMap<>();
-		this.historialGlobal = new ArrayList<>();
+		// this.historialGlobal = new ArrayList<>();
 	}
 
 	// METODOS PUBLICOS:
@@ -40,9 +43,9 @@ public class Billetera implements IBilletera {
 	public String toString() {
 		// muestro estado de la billetera
 		StringBuilder sb = new StringBuilder();
-		
+
 		sb.append("Usuarios registrados: ")
-			.append(diccUsuariosPorDni.size()).append(System.lineSeparator());
+				.append(diccUsuariosPorDni.size()).append(System.lineSeparator());
 		for (Usuario u : diccUsuariosPorDni.values()) {
 			sb.append("  ").append(u.toString()).append(System.lineSeparator());
 		}
@@ -52,7 +55,8 @@ public class Billetera implements IBilletera {
 		}
 		sb.append("Cuentas registradas: ").append(diccCuentasPorCvu.size()).append(System.lineSeparator());
 		for (Cuenta c : diccCuentasPorCvu.values()) {
-			sb.append("  ").append(c.toString()).append(" | saldo: ").append(c.getSaldo()).append(System.lineSeparator());
+			sb.append("  ").append(c.toString()).append(" | saldo: ").append(c.getSaldo())
+					.append(System.lineSeparator());
 		}
 		sb.append("Transferencias registradas: ").append(diccActividadesPorCvu.size()).append(System.lineSeparator());
 		for (List<Actividad> listAct : diccActividadesPorCvu.values()) {
@@ -151,7 +155,7 @@ public class Billetera implements IBilletera {
 			throw new IllegalArgumentException("el alias ya esta registrado");
 		if (!diccEmpresasPorCuit.containsKey(cuitEmpresa))
 			throw new IllegalArgumentException("la empresa no esta registrada");
-		
+
 		Empresa empresa = diccEmpresasPorCuit.get(cuitEmpresa);
 		if (!empresa.contienePersonaAutorizada(dniUsuario))
 			throw new IllegalArgumentException("el dni no esta autorizado a operar en nombre de la empresa");
@@ -219,9 +223,10 @@ public class Billetera implements IBilletera {
 		diccActividadesPorDNI.get(cuentaDestino.getDniUsuario()).add(transferencia);
 		diccActividadesPorCvu.get(cvuOrigen).add(transferencia);
 		diccActividadesPorCvu.get(cvuDestino).add(transferencia);
-		
+
 		// Registrar en historial global
-	    historialGlobal.add("Transferencia de " + monto + " desde " + cvuOrigen + " hacia " + cvuDestino);
+		// historialGlobal.add("Transferencia de " + monto + " desde " + cvuOrigen + "
+		// hacia " + cvuDestino);
 
 	}
 
@@ -242,9 +247,9 @@ public class Billetera implements IBilletera {
 			throw new IllegalArgumentException("Saldo insuficiente para realizar la inversión.");
 
 		InversionRentaFija inversion = new InversionRentaFija(cvu, monto, plazoDias);
-		
+
 		cuenta.debitarParaInversion(monto);
-		
+
 		int idInversion = inversion.getIdInversion();
 
 		diccActividadesPorDNI.get(dni).add(inversion);
@@ -267,14 +272,14 @@ public class Billetera implements IBilletera {
 		Cuenta cuenta = diccCuentasPorCvu.get(cvu);
 		if (!cuenta.getDniUsuario().equals(dni))
 			throw new IllegalArgumentException("La cuenta no pertenece al usuario.");
-	
+
 		if (cuenta.getSaldo() < monto)
 			throw new IllegalArgumentException("Saldo insuficiente para realizar la inversión.");
 
 		InversionDivisa inversion = new InversionDivisa(cvu, monto, plazoDias, divisa, tasa);
 
 		cuenta.debitarParaInversion(monto);
-		
+
 		int idInversion = inversion.getIdInversion();
 
 		diccActividadesPorDNI.get(dni).add(inversion);
@@ -301,13 +306,13 @@ public class Billetera implements IBilletera {
 
 		if (!(cuenta instanceof CuentaCorporativa))
 			throw new IllegalArgumentException("Esta inversion solo puede realizarse desde una Cuenta Corporativa");
-		if(monto < MONTO_MINIMO_FLE)
-			throw new IllegalArgumentException("Esta inversion requiere un monto minimo de " + MONTO_MINIMO_FLE );
+		if (monto < MONTO_MINIMO_FLE)
+			throw new IllegalArgumentException("Esta inversion requiere un monto minimo de " + MONTO_MINIMO_FLE);
 
 		InversionLiquidez inversion = new InversionLiquidez(cvu, monto, plazoDias);
 
 		cuenta.debitarParaInversion(monto);
-		
+
 		int idInversion = inversion.getIdInversion();
 
 		diccActividadesPorDNI.get(dni).add(inversion);
@@ -320,7 +325,7 @@ public class Billetera implements IBilletera {
 	// no hay un diccionario de inversiones, agregarlo esta ok? asi como lo tenemos
 	// + diccInversionesPorId
 	public void precancelarInversion(String dni, String cvu, int idInversion) {
-		
+
 		if (!diccUsuariosPorDni.containsKey(dni))
 			throw new IllegalArgumentException("El usuario no está registrado.");
 
@@ -335,51 +340,46 @@ public class Billetera implements IBilletera {
 
 		if (!inversionEsPrecancelable(idInversion))
 			throw new IllegalArgumentException("Este tipo de inversión no es precancelable.");
-		
+
 		Cuenta cuenta = diccCuentasPorCvu.get(cvu);
 		if (!cuenta.getDniUsuario().equals(dni))
 			throw new IllegalArgumentException("La cuenta no pertenece al usuario.");
-		
+
 		InversionPrecancelable inversion = (InversionPrecancelable) diccInversionesPorId.get(idInversion);
 
-	
 		double montoInvertidoMasIntereses = inversion.precancelar();
-		
+
 		cuenta.acreditar(montoInvertidoMasIntereses);
 
-
 	}
-	
 
 	public void procesarInversionesQueVencenHoy() {
-		 /**
-	     * [Bonus Track]
-	     * 15) Procesa todas las inversiones que vencen el dia de hoy
-	     * y actualiza los saldos agregando los intereses generados segun el tipo de
-	     * inversion.
-	     * Sea por taza fija o por cotización de activos más tasa.
-	     * 
-	     * El dia actual y las cotizaciones de los activos se deben consultar a
-	     * Utilitarios.
-	     * 
-	     */
+		/**
+		 * [Bonus Track]
+		 * 15) Procesa todas las inversiones que vencen el dia de hoy
+		 * y actualiza los saldos agregando los intereses generados segun el tipo de
+		 * inversion.
+		 * Sea por taza fija o por cotización de activos más tasa.
+		 * 
+		 * El dia actual y las cotizaciones de los activos se deben consultar a
+		 * Utilitarios.
+		 * 
+		 */
 		for (Inversion inversion : diccInversionesPorId.values()) {
 			if (inversion.venceHoy()) {
 				double montoInvertidoMasIntereses = inversion.calcularResultado();
-				
+
 				String cvu = inversion.getCvu();
-				
+
 				Cuenta cuenta = diccCuentasPorCvu.get(cvu);
-				
+
 				// Buscar la cuenta para acreditar
 				cuenta.acreditar(montoInvertidoMasIntereses);
-				
+
 			}
 		}
-		
+
 	}
-	
-	
 
 	private boolean inversionEsPrecancelable(int idInversion) {
 
@@ -411,45 +411,175 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public List<String> consultarHistorialGlobal() {
-		
-		return historialGlobal;
+		List<String> historial = new ArrayList<>();
+
+		// Iterar sobre todos los usuarios en el diccionario de actividades por DNI
+		for (String dniUsuario : diccActividadesPorDNI.keySet()) {
+			List<Actividad> actividades = diccActividadesPorDNI.get(dniUsuario);
+
+			for (Actividad act : actividades) {
+				if (act instanceof Transferencia) {
+					Transferencia trans = (Transferencia) act;
+					String cvuOrigen = trans.getCvu();
+					String cvuDestino = trans.getCvuDestino();
+					String dniDestino = diccCuentasPorCvu.get(cvuDestino).getDniUsuario();
+					String estado = trans.getEstado() ? "Aprobado" : "Rechazado";
+
+					historial.add("- transferencia:\n" +
+							"origen: " + dniUsuario + " (" + cvuOrigen + ")\n" +
+							"destino: " + dniDestino + " (" + cvuDestino + ")\n" +
+							"monto: " + trans.getMonto() + "\n" +
+							estado);
+				} else if (act instanceof Inversion) {
+					Inversion inv = (Inversion) act;
+					String cvu = inv.getCvu();
+					String tipo = obtenerTipoInversion(inv);
+					String estado = inv.getEstado() ? "Aprobado" : "Rechazado";
+
+					historial.add("- inversion:\n" +
+							"origen: " + dniUsuario + " (" + cvu + ")\n" +
+							"desc: " + tipo + "\n" +
+							"monto: " + inv.getMonto() + "\n" +
+							"plazo: " + inv.getPlazoDias() + "\n" +
+							estado);
+				}
+			}
+		}
+
+		return historial;
 	}
 
 	@Override
 	public List<String> consultarHistorialCuenta(String cvu) {
 
+		if (!diccCuentasPorCvu.containsKey(cvu))
+			throw new IllegalArgumentException("La cuenta no existe.");
+
+		List<String> historial = new ArrayList<>();
 		List<Actividad> actividades = diccActividadesPorCvu.get(cvu);
-		
-		if(actividades == null) {
-			return new ArrayList<>();
-		}else {
-			List<String> resultado = new ArrayList<>();
-			
-			for(Actividad actividad : actividades) {
-				resultado.add(actividad.toString());
+		String dniOrigen = diccCuentasPorCvu.get(cvu).getDniUsuario();
+
+		for (Actividad act : actividades) {
+			if (act instanceof Transferencia) {
+				Transferencia trans = (Transferencia) act;
+				String dniDestino = diccCuentasPorCvu.get(trans.getCvuDestino()).getDniUsuario();
+				String cvuDestino = trans.getCvuDestino();
+				String estado = trans.getEstado() ? "Aprobado" : "Rechazado";
+
+				historial.add("- transferencia:\n" +
+						"origen: " + dniOrigen + " (" + cvu + ")\n" +
+						"destino: " + dniDestino + " (" + cvuDestino + ")\n" +
+						"monto: " + trans.getMonto() + "\n" +
+						estado);
+
+			} else if (act instanceof Inversion) {
+				Inversion inv = (Inversion) act;
+				String tipo = obtenerTipoInversion(inv);
+				String estado = inv.getEstado() ? "Aprobado" : "Rechazado";
+
+				historial.add("- inversion:\n" +
+						"origen: " + dniOrigen + " (" + cvu + ")\n" +
+						"desc: " + tipo + "\n" +
+						"monto: " + inv.getMonto() + "\n" +
+						"plazo: " + inv.getPlazoDias() + "\n" +
+						estado);
 			}
-			
-			return resultado;
 		}
+
+		return historial;
+	}
+
+	private String obtenerTipoInversion(Inversion inversion) {
+		if (inversion instanceof InversionRentaFija) {
+			return "renta fija";
+		} else if (inversion instanceof InversionDivisa) {
+			return "divisa";
+		} else if (inversion instanceof InversionLiquidez) {
+			return "liquidez";
+		}
+		return "desconocida";
 	}
 
 	@Override
 	public List<String> consultarHistorialUsuario(String dniUsuario) {
-		
+		if (!diccUsuariosPorDni.containsKey(dniUsuario))
+			throw new IllegalArgumentException("El usuario no existe.");
+
+		List<String> historial = new ArrayList<>();
 		List<Actividad> actividades = diccActividadesPorDNI.get(dniUsuario);
-		
-		if(actividades == null) {
-			return new ArrayList<>();
-		}else {
-			List<String> resultado = new ArrayList<>();
-			
-			for(Actividad actividad : actividades) {
-				resultado.add(actividad.toString());
+
+		for (Actividad act : actividades) {
+			if (act instanceof Transferencia) {
+				Transferencia trans = (Transferencia) act;
+				String cvuOrigen = trans.getCvu();
+				String cvuDestino = trans.getCvuDestino();
+				String dniDestino = diccCuentasPorCvu.get(cvuDestino).getDniUsuario();
+				String estado = trans.getEstado() ? "Aprobado" : "Rechazado";
+
+				historial.add("- transferencia:\n" +
+						"origen: " + dniUsuario + " (" + cvuOrigen + ")\n" +
+						"destino: " + dniDestino + " (" + cvuDestino + ")\n" +
+						"monto: " + trans.getMonto() + "\n" +
+						estado);
+			} else if (act instanceof Inversion) {
+				Inversion inv = (Inversion) act;
+				String cvu = inv.getCvu();
+				String tipo = obtenerTipoInversion(inv);
+				String estado = inv.getEstado() ? "Aprobado" : "Rechazado";
+
+				historial.add("- inversion:\n" +
+						"origen: " + dniUsuario + " (" + cvu + ")\n" +
+						"desc: " + tipo + "\n" +
+						"monto: " + inv.getMonto() + "\n" +
+						"plazo: " + inv.getPlazoDias() + "\n" +
+						estado);
 			}
-			
-			return resultado;
 		}
+
+		return historial;
 	}
+
+	// @Override
+	// public List<String> consultarHistorialGlobal() {
+	//
+	// return historialGlobal;
+	// }
+
+	// @Override
+	// public List<String> consultarHistorialCuenta(String cvu) {
+
+	// List<Actividad> actividades = diccActividadesPorCvu.get(cvu);
+
+	// if(actividades == null) {
+	// return new ArrayList<>();
+	// }else {
+	// List<String> resultado = new ArrayList<>();
+
+	// for(Actividad actividad : actividades) {
+	// resultado.add(actividad.toString());
+	// }
+
+	// return resultado;
+	// }
+	// }
+
+	// @Override
+	// public List<String> consultarHistorialUsuario(String dniUsuario) {
+
+	// List<Actividad> actividades = diccActividadesPorDNI.get(dniUsuario);
+
+	// if(actividades == null) {
+	// return new ArrayList<>();
+	// }else {
+	// List<String> resultado = new ArrayList<>();
+
+	// for(Actividad actividad : actividades) {
+	// resultado.add(actividad.toString());
+	// }
+
+	// return resultado;
+	// }
+	// }
 
 	@Override
 	public double obtenerTotalInvertido(String dniUsuario) {
@@ -471,27 +601,27 @@ public class Billetera implements IBilletera {
 	public List<String> cuentasConMayorVolumen(int cantidadTop) {
 
 		List<String> resultado = new ArrayList<>();
-		List<String> cvus = new ArrayList<>(diccActividadesPorCvu.keySet()); //guardamos cvus
-		
-		for (int i= 0; i < cantidadTop; i++) {
-			
-			String cvuMayor = cvus.get(0); //iniciamos en primer valor
-			
+		List<String> cvus = new ArrayList<>(diccActividadesPorCvu.keySet()); // guardamos cvus
+
+		for (int i = 0; i < cantidadTop; i++) {
+
+			String cvuMayor = cvus.get(0); // iniciamos en primer valor
+
 			for (String cvu : cvus) {
-				
-				int valor1 = diccActividadesPorCvu.get(cvu).size(); //guardamos cuantas act tiene el cvu
+
+				int valor1 = diccActividadesPorCvu.get(cvu).size(); // guardamos cuantas act tiene el cvu
 				int valor2 = diccActividadesPorCvu.get(cvuMayor).size();
-				
+
 				if (valor1 > valor2) {
 					cvuMayor = cvu;
 				}
 			}
-			
-			resultado.add(cvuMayor); //guardamos el mas grande
-			
-			cvus.remove(cvuMayor); //se elimina para buscar el sig más grande
+
+			resultado.add(cvuMayor); // guardamos el mas grande
+
+			cvus.remove(cvuMayor); // se elimina para buscar el sig más grande
 		}
-		
+
 		return resultado;
 	}
 
@@ -521,6 +651,5 @@ public class Billetera implements IBilletera {
 			throw new IllegalArgumentException("El nombre de contacto no puede ser vacio o no tener caracteres");
 
 	}
-
 
 }

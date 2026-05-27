@@ -6,6 +6,7 @@ public abstract class Actividad {
     protected LocalDate fecha;
     protected double monto;
     private String cvu;
+    protected boolean estado;
 
     public Actividad(LocalDate fecha, double monto, String cvu) {
         if (fecha == null) {
@@ -21,6 +22,15 @@ public abstract class Actividad {
         this.fecha = fecha;
         this.monto = monto;
         this.cvu = cvu;
+        this.estado = true; // Por defecto: aprobado
+    }
+
+    public boolean getEstado() {
+        return estado;
+    }
+
+    public void setEstado(boolean estado) {
+        this.estado = estado; // true = aprobado, false = rechazado
     }
 
     public LocalDate getFecha() {

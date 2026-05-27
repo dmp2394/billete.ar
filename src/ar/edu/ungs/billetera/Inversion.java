@@ -1,6 +1,6 @@
 package ar.edu.ungs.billetera;
 
-import java.time.LocalDate;
+//import java.time.LocalDate;
 
 public abstract class Inversion extends Actividad {
 
@@ -21,8 +21,7 @@ public abstract class Inversion extends Actividad {
         this.activa = true;
     }
 
-
-	public int getIdInversion() {
+    public int getIdInversion() {
         return idInversion; // Retornar el ID almacenado
     }
 
@@ -35,17 +34,15 @@ public abstract class Inversion extends Actividad {
     }
 
     public abstract double calcularResultado();
-    
+
     protected void finalizar() {
-    	this.actualizarFecha(Utilitarios.hoy());
-    	this.activa=false;
-	}
+        this.actualizarFecha(Utilitarios.hoy());
+        this.activa = false;
+    }
 
+    public boolean venceHoy() {
 
-	public boolean venceHoy() {
-		
-		return this.fecha.plusDays(plazoDias).equals(Utilitarios.hoy());
-	}
-    
- 
+        return this.fecha.plusDays(plazoDias).equals(Utilitarios.hoy());
+    }
+
 }
