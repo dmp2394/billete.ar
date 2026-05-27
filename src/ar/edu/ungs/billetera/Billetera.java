@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Billetera implements IBilletera {
 
+	private static final double MONTO_MINIMO_FLE = 20000000;
 	// TODO: INFORME, PUNTO BONUS, TAREA DE COMPLEJIDAD, SUMAR TESTS, 
 	// REGISTRAR HISTORIAL EN DONDE FALTE, USAR STRINGBUILDER,
 	// REVISAR toString DE BILLETERA Y DERIVADOS 
@@ -37,8 +38,33 @@ public class Billetera implements IBilletera {
 	// METODOS PUBLICOS:
 	@Override
 	public String toString() {
-
-		return ("cantidad de usuarios, empresas, cuentas, etc");
+		// muestro estado de la billetera
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("Usuarios registrados: ")
+			.append(diccUsuariosPorDni.size()).append(System.lineSeparator());
+		for (Usuario u : diccUsuariosPorDni.values()) {
+			sb.append("  ").append(u.toString()).append(System.lineSeparator());
+		}
+		sb.append("Empresas registradas: ").append(diccEmpresasPorCuit.size()).append(System.lineSeparator());
+		for (Empresa e : diccEmpresasPorCuit.values()) {
+			sb.append("  ").append(e.toString()).append(System.lineSeparator());
+		}
+		sb.append("Cuentas registradas: ").append(diccCuentasPorCvu.size()).append(System.lineSeparator());
+		for (Cuenta c : diccCuentasPorCvu.values()) {
+			sb.append("  ").append(c.toString()).append(" | saldo: ").append(c.getSaldo()).append(System.lineSeparator());
+		}
+		sb.append("Transferencias registradas: ").append(diccActividadesPorCvu.size()).append(System.lineSeparator());
+		for (List<Actividad> listAct : diccActividadesPorCvu.values()) {
+			for (Actividad act : listAct)
+				if (act instanceof Transferencia)
+					sb.append("  ").append(act.toString()).append(System.lineSeparator());
+		}
+		sb.append("Inversiones registradas: ").append(diccInversionesPorId.size()).append(System.lineSeparator());
+		for (Inversion inv : diccInversionesPorId.values()) {
+			sb.append("  ").append(inv.toString()).append(System.lineSeparator());
+		}
+		return sb.toString();
 	}
 
 	@Override
@@ -101,12 +127,12 @@ public class Billetera implements IBilletera {
 	@Override
 	public String crearCuentaPremium(String dniUsuario, String alias, double depositoInicial) {
 
-		CuentaPremium cuentaPremium = new CuentaPremium(dniUsuario, alias, depositoInicial);
-
 		if (!diccUsuariosPorDni.containsKey(dniUsuario))
 			throw new IllegalArgumentException("el usuario no esta registrado");
 		if (diccCuentasPorCvu.containsKey(alias))
 			throw new IllegalArgumentException("el alias ya esta registrado");
+
+		CuentaPremium cuentaPremium = new CuentaPremium(dniUsuario, alias, depositoInicial);
 
 		String cvu = cuentaPremium.getCvu();
 
@@ -119,14 +145,19 @@ public class Billetera implements IBilletera {
 	@Override
 	public String crearCuentaCorporativa(String dniUsuario, String alias, String cuitEmpresa) {
 
-		CuentaCorporativa cuentaCorporativa = new CuentaCorporativa(dniUsuario, alias, cuitEmpresa);
-
 		if (!diccUsuariosPorDni.containsKey(dniUsuario))
 			throw new IllegalArgumentException("el usuario no esta registrado");
 		if (diccCuentasPorCvu.containsKey(alias))
 			throw new IllegalArgumentException("el alias ya esta registrado");
 		if (!diccEmpresasPorCuit.containsKey(cuitEmpresa))
 			throw new IllegalArgumentException("la empresa no esta registrada");
+		
+		Empresa empresa = diccEmpresasPorCuit.get(cuitEmpresa);
+		if (!empresa.contienePersonaAutorizada(dniUsuario))
+			throw new IllegalArgumentException("el dni no esta autorizado a operar en nombre de la empresa");
+
+		CuentaCorporativa cuentaCorporativa = new CuentaCorporativa(dniUsuario, alias, cuitEmpresa);
+
 		String cvu = cuentaCorporativa.getCvu();
 		diccCuentasPorCvu.put(cvu, cuentaCorporativa);
 		diccActividadesPorCvu.put(cvu, new java.util.ArrayList<>());
@@ -147,10 +178,8 @@ public class Billetera implements IBilletera {
 			if (cuenta.getDniUsuario().equals(dniUsuario)) { // si el dni de la cuenta coincide con el dni del usuario,
 																// agrego a la lista el tipo de cuenta, el alias y el
 																// cvu
-				String tipo = cuenta.getClass().getSimpleName(); // obtengo el tipo de cuenta (Regular, Premium o
-																	// Corporativa) a partir del nombre de la clase
-				cuentasUsuario.add(tipo + ": " + cuenta.getAlias() + " " + cvu); // agrego a la lista el tipo de cuenta,
-																					// el alias y el cvu
+				String tipo = cuenta.getClass().getSimpleName().replace("Cuenta", "");
+				cuentasUsuario.add(tipo + ": " + cuenta.getAlias() + " (" + cvu + ")");
 			}
 		}
 
@@ -160,6 +189,8 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public double obtenerSaldoDisponible(String cvu) {
+		if (!diccCuentasPorCvu.containsKey(cvu))
+			throw new IllegalArgumentException("la cuenta no existe");
 		return diccCuentasPorCvu.get(cvu).getSaldo();
 	}
 
@@ -212,8 +243,7 @@ public class Billetera implements IBilletera {
 
 		InversionRentaFija inversion = new InversionRentaFija(cvu, monto, plazoDias);
 		
-		cuenta.debitar(monto);
-		diccCuentasPorCvu.replace(cvu, cuenta);
+		cuenta.debitarParaInversion(monto);
 		
 		int idInversion = inversion.getIdInversion();
 
@@ -243,8 +273,7 @@ public class Billetera implements IBilletera {
 
 		InversionDivisa inversion = new InversionDivisa(cvu, monto, plazoDias, divisa, tasa);
 
-		cuenta.debitar(monto);
-		diccCuentasPorCvu.replace(cvu, cuenta);
+		cuenta.debitarParaInversion(monto);
 		
 		int idInversion = inversion.getIdInversion();
 
@@ -272,11 +301,12 @@ public class Billetera implements IBilletera {
 
 		if (!(cuenta instanceof CuentaCorporativa))
 			throw new IllegalArgumentException("Esta inversion solo puede realizarse desde una Cuenta Corporativa");
+		if(monto < MONTO_MINIMO_FLE)
+			throw new IllegalArgumentException("Esta inversion requiere un monto minimo de " + MONTO_MINIMO_FLE );
 
 		InversionLiquidez inversion = new InversionLiquidez(cvu, monto, plazoDias);
 
-		cuenta.debitar(monto);
-		diccCuentasPorCvu.replace(cvu, cuenta);
+		cuenta.debitarParaInversion(monto);
 		
 		int idInversion = inversion.getIdInversion();
 
@@ -305,48 +335,21 @@ public class Billetera implements IBilletera {
 
 		if (!inversionEsPrecancelable(idInversion))
 			throw new IllegalArgumentException("Este tipo de inversión no es precancelable.");
-
+		
+		Cuenta cuenta = diccCuentasPorCvu.get(cvu);
+		if (!cuenta.getDniUsuario().equals(dni))
+			throw new IllegalArgumentException("La cuenta no pertenece al usuario.");
+		
 		InversionPrecancelable inversion = (InversionPrecancelable) diccInversionesPorId.get(idInversion);
 
-		// actualizar saldo de la cuenta, paga la mitad de los intereses hasta el
-		// momento
-		Cuenta cuenta = diccCuentasPorCvu.get(cvu);
 	
 		double montoInvertidoMasIntereses = inversion.precancelar();
 		
 		cuenta.acreditar(montoInvertidoMasIntereses);
 
-		// actualizar historial
-		actualizarHistorial(idInversion, dni, cvu);
 
 	}
 	
-	
-	private void actualizarHistorial(int idInversion, String dni, String cvu) {
-		// actualizar actividad en:
-		// diccActividadesPorDNI, diccActividadesPorCvu, diccInversionesPorId
-		List<Actividad> actividadesPorDNI = diccActividadesPorDNI.get(dni);
-		List<Actividad> actividadesPorCvu = diccActividadesPorCvu.get(cvu);
-		Inversion inversion = diccInversionesPorId.get(idInversion);
-
-		// actualizo los 3 diccionarios a su manera
-		for (int i = 0; i < actividadesPorDNI.size(); i++) {
-			if (actividadesPorDNI.get(i) instanceof InversionPrecancelable
-					&& ((InversionPrecancelable) actividadesPorDNI.get(i)).getIdInversion() == idInversion) {
-				actividadesPorDNI.set(i, inversion);
-			}
-		}
-
-		for (int i = 0; i < actividadesPorCvu.size(); i++) {
-			if (actividadesPorCvu.get(i) instanceof InversionPrecancelable
-					&& ((InversionPrecancelable) actividadesPorCvu.get(i)).getIdInversion() == idInversion) {
-				actividadesPorCvu.set(i, inversion);
-			}
-		}
-
-		diccInversionesPorId.replace(idInversion, inversion);
-		
-	}
 
 	public void procesarInversionesQueVencenHoy() {
 		 /**
@@ -364,13 +367,13 @@ public class Billetera implements IBilletera {
 			if (inversion.venceHoy()) {
 				double montoInvertidoMasIntereses = inversion.calcularResultado();
 				
+				String cvu = inversion.getCvu();
+				
+				Cuenta cuenta = diccCuentasPorCvu.get(cvu);
+				
 				// Buscar la cuenta para acreditar
 				cuenta.acreditar(montoInvertidoMasIntereses);
 				
-				String dni = 
-				String cvu = 
-				// actualizar historial
-				actualizarHistorial(idInversion, dni, cvu);
 			}
 		}
 		
@@ -386,7 +389,7 @@ public class Billetera implements IBilletera {
 	private boolean existeInversion(int idInversion) {
 		Inversion inversion = diccInversionesPorId.get(idInversion);
 
-		return inversion != null ? true : false;
+		return inversion != null;
 	}
 
 	private boolean inversionEstaActiva(int idInversion) {
@@ -496,8 +499,6 @@ public class Billetera implements IBilletera {
 	/*
 	 * Lanza error si la empresa ya esta registrada o algun campo es inválido.
 	 */
-	// TODO: validaciones correctas? se puede validar que ademas telefono sea un
-	// numero, que nombre no sea un numero etc
 	private void validarCamposRegistrarEmpresa(String cuit, String nombreFantasia, String telefono, String email,
 			String nombreContacto) {
 

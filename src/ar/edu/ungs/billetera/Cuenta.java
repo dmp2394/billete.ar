@@ -44,6 +44,9 @@ public abstract class Cuenta {
     // metodos abstractos asi las subclases deben implementarlos si o si
     public abstract void debitar(double monto);
 
+    // este no suma al disponible
+    public abstract void debitarParaInversion(double monto);
+
     public abstract void acreditar(double monto);
 
 }

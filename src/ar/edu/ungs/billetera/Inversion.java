@@ -11,7 +11,7 @@ public abstract class Inversion extends Actividad {
     protected boolean activa;
 
     public Inversion(String cvu, double monto, int plazoDias) {
-        super(LocalDate.now(), monto, cvu);
+        super(Utilitarios.hoy(), monto, cvu);
         if (plazoDias <= 0) {
             throw new IllegalArgumentException("El plazo en días debe ser mayor a cero.");
         }
@@ -19,7 +19,6 @@ public abstract class Inversion extends Actividad {
         this.plazoDias = plazoDias;
         this.idInversion = contadorId++;
         this.activa = true;
-        this.fecha = Utilitarios.hoy();
     }
 
 
@@ -42,4 +41,11 @@ public abstract class Inversion extends Actividad {
     	this.activa=false;
 	}
 
+
+	public boolean venceHoy() {
+		
+		return this.fecha.plusDays(plazoDias).equals(Utilitarios.hoy());
+	}
+    
+ 
 }

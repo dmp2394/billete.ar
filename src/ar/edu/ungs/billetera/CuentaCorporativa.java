@@ -33,4 +33,8 @@ public class CuentaCorporativa extends Cuenta {
         this.saldo -= monto;
     }
 
+    public void debitarParaInversion(double monto) {
+        debitar(monto);
+    }
+
 }

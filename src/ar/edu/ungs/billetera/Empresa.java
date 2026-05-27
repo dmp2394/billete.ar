@@ -29,4 +29,19 @@ public class Empresa {
 		return dnisPersonasAutorizadas.contains(dniAutorizado);
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Empresa [cuit: ").append(cuit)
+			.append(", ")
+			.append("nombre de fantasia: ").append(nombreFantasia)
+			.append(", ")
+			.append("telefono: ").append(telefono)
+			.append(", ")
+			.append("email: ").append(email)
+			.append(", ")
+			.append("nombre de contacto: ").append(nombreContacto);
+			
+		return sb.toString();
+	}
 }

@@ -4,8 +4,6 @@ public class CuentaRegular extends Cuenta {
 
     private final double SALDO_MAXIMO = 5000000;
 
-    private double depositoFinal;
-
     public CuentaRegular(String dniUsuario, String alias) {
         super(dniUsuario, alias);
 
@@ -21,9 +19,6 @@ public class CuentaRegular extends Cuenta {
         if (this.saldo + monto > SALDO_MAXIMO)
             throw new IllegalStateException(
                     "las cuentas regulares no pueden recibir transferencias mayores a " + SALDO_MAXIMO);
-        if (depositoFinal > SALDO_MAXIMO)
-            throw new IllegalArgumentException(
-                    "El depósito inicial para una cuenta Regular no puede superar los $5000000.");
 
         this.saldo += monto;
     }
@@ -35,7 +30,8 @@ public class CuentaRegular extends Cuenta {
         this.saldo -= monto;
     }
 
-    public double getDepositoFinal() {
-        return depositoFinal;
+    public void debitarParaInversion(double monto) {
+        debitar(monto);
     }
+
 }

@@ -23,7 +23,7 @@ public class CuentaPremium extends Cuenta {
     }
 
     public String toString() {
-        return "CuentaPrenium [dniUsuario=" + getDniUsuario() + ", alias=" + getAlias()
+        return "CuentaPremium [dniUsuario=" + getDniUsuario() + ", alias=" + getAlias()
                 + ", depositoInicial=" + depositoInicial + "]";
     }
 
@@ -35,9 +35,15 @@ public class CuentaPremium extends Cuenta {
     // mínimo en cuenta de 500 mil pesos
     public void debitar(double monto) {
 
-        if (this.saldo - monto < SALDO_MINIMO)
+    	if ((this.saldo - monto) < SALDO_MINIMO)
             throw new IllegalStateException("se debe mantener un saldo minimo en cuenta de " + SALDO_MINIMO);
 
+        this.saldo -= monto;
+    }
+
+    public void debitarParaInversion(double monto) {
+        if (this.saldo < monto)
+            throw new IllegalStateException("saldo insuficiente");
         this.saldo -= monto;
     }
 }
