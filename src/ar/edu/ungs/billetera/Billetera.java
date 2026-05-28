@@ -7,16 +7,7 @@ import java.util.List;
 public class Billetera implements IBilletera {
 
 	private static final double MONTO_MINIMO_FLE = 20000000;
-	// TODO: INFORME, PUNTO BONUS, TAREA DE COMPLEJIDAD, SUMAR TESTS,
-	// REGISTRAR HISTORIAL EN DONDE FALTE, USAR STRINGBUILDER,
-	// REVISAR toString DE BILLETERA Y DERIVADOS
-	//
-	// debitar saldo al invertir?
-	// que se supone que deberia hacer calcularResultado? lo que corrigio el
-	// profesor. Devuelve el total y finaliza la inversion? o sea monto + interés y
-	// pone estado inactivo
-	// esta bien como calculamos el interes del fondo de liquidez? igual que renta
-	// fija pero con otra tasa
+
 
 	// ATRIBUTOS
 	private HashMap<String, Empresa> diccEmpresasPorCuit;
@@ -25,7 +16,7 @@ public class Billetera implements IBilletera {
 	private HashMap<String, List<Actividad>> diccActividadesPorDNI;
 	private HashMap<String, List<Actividad>> diccActividadesPorCvu;
 	private HashMap<Integer, Inversion> diccInversionesPorId;
-	// private List<String> historialGlobal;
+	private HashMap<String, Double> diccTotalInvertidoPorDni;
 
 	// CONSTRUCTOR. INICIALIZO VARIABLES
 	public Billetera() {
@@ -35,7 +26,7 @@ public class Billetera implements IBilletera {
 		this.diccActividadesPorDNI = new HashMap<>();
 		this.diccActividadesPorCvu = new HashMap<>();
 		this.diccInversionesPorId = new HashMap<>();
-		// this.historialGlobal = new ArrayList<>();
+		this.diccTotalInvertidoPorDni = new HashMap<>();
 	}
 
 	// METODOS PUBLICOS:
@@ -101,13 +92,15 @@ public class Billetera implements IBilletera {
 	@Override
 	public void registrarUsuario(String dni, String nombre, String telefono, String email) {
 
-		Usuario usuario = new Usuario(dni, nombre, telefono, email); // creo el usuario con los datos ingresados
-
-		if (diccUsuariosPorDni.containsKey(dni)) // busca si ya esta registrado un usuario con ese dni, si es asi lanza
-													// error
+		if (diccUsuariosPorDni.containsKey(dni)) // busca si ya esta registrado un usuario con ese dni, si es asi lanza error
 			throw new IllegalArgumentException("el usuario ya esta registrado");
+
+		Usuario usuario = new Usuario(dni, nombre, telefono, email); // creo el usuario con los datos ingresados
 		diccUsuariosPorDni.put(dni, usuario); // si no esta registrado, lo agrega al diccionario de usuarios
-		diccActividadesPorDNI.put(dni, new java.util.ArrayList<>()); // Inicializar lista de actividades
+		
+		// inicializar
+		diccActividadesPorDNI.put(dni, new java.util.ArrayList<>());
+		diccTotalInvertidoPorDni.put(dni, 0.0); // Inicializar total invertido en 0
 	}
 
 	@Override
@@ -255,6 +248,9 @@ public class Billetera implements IBilletera {
 		diccActividadesPorDNI.get(dni).add(inversion);
 		diccActividadesPorCvu.get(cvu).add(inversion);
 		diccInversionesPorId.put(idInversion, inversion);
+		
+		double totalInvertidoPorDni = diccTotalInvertidoPorDni.get(dni) + monto;
+		diccTotalInvertidoPorDni.put(dni, totalInvertidoPorDni);
 
 		return idInversion;
 
@@ -286,6 +282,9 @@ public class Billetera implements IBilletera {
 		diccActividadesPorCvu.get(cvu).add(inversion);
 		diccInversionesPorId.put(idInversion, inversion);
 
+		double totalInvertidoPorDni = diccTotalInvertidoPorDni.get(dni) + monto;
+		diccTotalInvertidoPorDni.put(dni, totalInvertidoPorDni);
+		
 		return idInversion;
 	}
 
@@ -318,6 +317,9 @@ public class Billetera implements IBilletera {
 		diccActividadesPorDNI.get(dni).add(inversion);
 		diccActividadesPorCvu.get(cvu).add(inversion);
 		diccInversionesPorId.put(idInversion, inversion);
+		
+		double totalInvertidoPorDni = diccTotalInvertidoPorDni.get(dni) + monto;
+		diccTotalInvertidoPorDni.put(dni, totalInvertidoPorDni);
 
 		return idInversion;
 	}
@@ -348,6 +350,10 @@ public class Billetera implements IBilletera {
 		InversionPrecancelable inversion = (InversionPrecancelable) diccInversionesPorId.get(idInversion);
 
 		double montoInvertidoMasIntereses = inversion.precancelar();
+		
+		// como es una inversion que se terminó, actualizo el diccTotalInvertidoPorDni
+		double totalInvertidoPorDni = diccTotalInvertidoPorDni.get(dni) - inversion.getMonto();
+		diccTotalInvertidoPorDni.put(dni, totalInvertidoPorDni);
 
 		cuenta.acreditar(montoInvertidoMasIntereses);
 
@@ -366,15 +372,18 @@ public class Billetera implements IBilletera {
 		 * 
 		 */
 		for (Inversion inversion : diccInversionesPorId.values()) {
-			if (inversion.venceHoy()) {
+			if (inversion.estaActiva() && inversion.venceHoy()) {
 				double montoInvertidoMasIntereses = inversion.calcularResultado();
 
 				String cvu = inversion.getCvu();
 
 				Cuenta cuenta = diccCuentasPorCvu.get(cvu);
 
-				// Buscar la cuenta para acreditar
 				cuenta.acreditar(montoInvertidoMasIntereses);
+				
+				String dni = cuenta.getDniUsuario();
+				double totalInvertidoPorDni = diccTotalInvertidoPorDni.get(dni) - inversion.getMonto();
+				diccTotalInvertidoPorDni.put(dni, totalInvertidoPorDni);
 
 			}
 		}
@@ -539,62 +548,15 @@ public class Billetera implements IBilletera {
 		return historial;
 	}
 
-	// @Override
-	// public List<String> consultarHistorialGlobal() {
-	//
-	// return historialGlobal;
-	// }
-
-	// @Override
-	// public List<String> consultarHistorialCuenta(String cvu) {
-
-	// List<Actividad> actividades = diccActividadesPorCvu.get(cvu);
-
-	// if(actividades == null) {
-	// return new ArrayList<>();
-	// }else {
-	// List<String> resultado = new ArrayList<>();
-
-	// for(Actividad actividad : actividades) {
-	// resultado.add(actividad.toString());
-	// }
-
-	// return resultado;
-	// }
-	// }
-
-	// @Override
-	// public List<String> consultarHistorialUsuario(String dniUsuario) {
-
-	// List<Actividad> actividades = diccActividadesPorDNI.get(dniUsuario);
-
-	// if(actividades == null) {
-	// return new ArrayList<>();
-	// }else {
-	// List<String> resultado = new ArrayList<>();
-
-	// for(Actividad actividad : actividades) {
-	// resultado.add(actividad.toString());
-	// }
-
-	// return resultado;
-	// }
-	// }
-
+	
 	@Override
 	public double obtenerTotalInvertido(String dniUsuario) {
 
 		if (!diccUsuariosPorDni.containsKey(dniUsuario))
 			throw new IllegalArgumentException("el usuario no existe");
+		
 
-		double totalInvertido = 0;
-		List<Actividad> listaActividades = diccActividadesPorDNI.get(dniUsuario);
-
-		for (Actividad actividad : listaActividades)
-			if (actividad instanceof Inversion && ((Inversion) actividad).estaActiva())
-				totalInvertido += actividad.getMonto();
-
-		return totalInvertido;
+		return diccTotalInvertidoPorDni.get(dniUsuario);
 	}
 
 	@Override
