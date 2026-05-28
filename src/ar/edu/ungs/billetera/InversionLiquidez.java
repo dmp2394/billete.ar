@@ -26,9 +26,8 @@ public class InversionLiquidez extends Inversion {
 	}
 
 	public String toString() {
-		return "InversionLiquidez [TASA_ACTIVO_FLE=" + TASA_ACTIVO_FLE + ", plazoDias=" + plazoDias
-				+ ", idInversion=" + getIdInversion() + ", activa=" + estaActiva() + ", fecha=" + fecha + ", monto="
-				+ monto + ", cvu=" + getCvu() + "]";
+		return "InversionLiquidez [fecha=" + fecha + ", monto=" + monto + ", tasa=" + (TASA_ACTIVO_FLE * 100)
+				+ "%, plazoDias=" + plazoDias + ", idInversion=" + getIdInversion() + ", cvu=" + getCvu() + "]";
 	}
 
 }

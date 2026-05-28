@@ -10,8 +10,9 @@ import java.util.Set;
 
 public class Billetera implements IBilletera {
 
-	private final double MONTO_MINIMO_FLE = 20000000;
 
+
+	private final double MONTO_MINIMO_FLE = 20000000;
 
 	// ATRIBUTOS
 	private HashMap<String, Empresa> diccEmpresasPorCuit;
@@ -474,24 +475,26 @@ public class Billetera implements IBilletera {
 
 		List<String> historial = new ArrayList<>();
 		List<Actividad> actividades = diccActividadesPorCvu.get(cvu);
-		String dniOrigen = diccCuentasPorCvu.get(cvu).getDniUsuario();
 
 		for (Actividad act : actividades) {
 			if (act instanceof Transferencia) {
 				Transferencia trans = (Transferencia) act;
+				String cvuReal = trans.getCvu();
+				String dniReal = diccCuentasPorCvu.get(cvuReal).getDniUsuario();
 				String dniDestino = diccCuentasPorCvu.get(trans.getCvuDestino()).getDniUsuario();
 				String cvuDestino = trans.getCvuDestino();
 				String estado = trans.getEstado() ? "Aprobado" : "Rechazado";
 
 				historial.add("- transferencia:\n" +
 						"fecha: " + trans.getFecha() + "\n" +
-						"origen: " + dniOrigen + " (" + cvu + ")\n" +
+						"origen: " + dniReal + " (" + cvuReal + ")\n" +
 						"destino: " + dniDestino + " (" + cvuDestino + ")\n" +
 						"monto: " + trans.getMonto() + "\n" +
 						estado);
 
 			} else if (act instanceof Inversion) {
 				Inversion inv = (Inversion) act;
+				String dniOrigen = diccCuentasPorCvu.get(cvu).getDniUsuario();
 				String tipo = obtenerTipoInversion(inv);
 				String estado = inv.getEstado() ? "Aprobado" : "Rechazado";
 

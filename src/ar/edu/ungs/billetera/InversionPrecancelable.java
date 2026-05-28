@@ -13,7 +13,7 @@ public abstract class InversionPrecancelable extends Inversion {
 	protected abstract double calcularInteres();
 
 	public String toString() {
-		return "InversionPrecancelable [plazoDias=" + plazoDias + ", idInversion=" + getIdInversion() + ", activa="
-				+ estaActiva() + ", fecha=" + fecha + ", monto=" + monto + ", cvu=" + getCvu() + "]";
+		return "InversionPrecancelable [fecha=" + fecha + ", monto=" + monto + ", plazoDias=" + plazoDias
+				+ ", idInversion=" + getIdInversion() + ", cvu=" + getCvu() + "]";
 	}
 }
