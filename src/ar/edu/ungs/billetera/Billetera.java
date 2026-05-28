@@ -2,8 +2,10 @@ package ar.edu.ungs.billetera;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class Billetera implements IBilletera {
 
@@ -53,12 +55,18 @@ public class Billetera implements IBilletera {
 					.append(System.lineSeparator());
 		}
 		
-		sb.append("Transferencias registradas: ").append(diccActividadesPorCvu.size()).append(System.lineSeparator());
-		for (List<Actividad> listAct : diccActividadesPorCvu.values()) {
+		// esto lo hago para mostrar 1 sola transferencia en el estado de la billetera, sino se va a mostrar el mismo registro por duplicado
+		// convierto a HashSet y agrego Las transferencias que encuentro. Esto funciona porque ambas transferencias son el mismo objeto, pues 
+		// en realizarTransferencia se agrega la misma tanto en el cvu de origen como de destino
+		Set<Actividad> transferenciasUnicas = new HashSet<>();
+		for (List<Actividad> listAct : diccActividadesPorCvu.values())
 			for (Actividad act : listAct)
 				if (act instanceof Transferencia)
-					sb.append("  ").append(act.toString()).append(System.lineSeparator());
-		}
+					transferenciasUnicas.add(act);
+		
+		sb.append("Transferencias registradas: ").append(transferenciasUnicas.size()).append(System.lineSeparator());
+		for (Actividad act : transferenciasUnicas)
+			sb.append("  ").append(act.toString()).append(System.lineSeparator());
 		
 		sb.append("Inversiones registradas: ").append(diccInversionesPorId.size()).append(System.lineSeparator());
 		for (Inversion inv : diccInversionesPorId.values()) {
@@ -215,11 +223,10 @@ public class Billetera implements IBilletera {
 
 		Cuenta cuentaDestino = diccCuentasPorCvu.get(cvuDestino);
 
-		cuentaOrigen.debitar(monto);
 		cuentaDestino.acreditar(monto);
+		cuentaOrigen.debitar(monto);
 
 		diccActividadesPorDNI.get(cuentaOrigen.getDniUsuario()).add(transferencia);
-		diccActividadesPorDNI.get(cuentaDestino.getDniUsuario()).add(transferencia);
 		diccActividadesPorCvu.get(cvuOrigen).add(transferencia);
 		diccActividadesPorCvu.get(cvuDestino).add(transferencia);
 
@@ -414,7 +421,6 @@ public class Billetera implements IBilletera {
 	public List<String> consultarHistorialGlobal() {
 		List<String> historial = new ArrayList<>();
 
-		// Iterar sobre todos los usuarios en el diccionario de actividades por DNI
 		for (String dniUsuario : diccActividadesPorDNI.keySet()) {
 			List<Actividad> actividades = diccActividadesPorDNI.get(dniUsuario);
 
@@ -559,6 +565,11 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public List<String> cuentasConMayorVolumen(int cantidadTop) {
+
+		if (cantidadTop <= 0)
+			throw new IllegalArgumentException("cantidadTop debe ser mayor a cero.");
+		if (cantidadTop > diccCuentasPorCvu.size())
+			throw new IllegalArgumentException("cantidadTop no debe exceder la cantidad de cuentas creadas");
 
 		List<String> resultado = new ArrayList<>();
 		List<String> cvus = new ArrayList<>(diccActividadesPorCvu.keySet()); // guardamos cvus
