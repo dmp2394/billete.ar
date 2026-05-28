@@ -40,8 +40,8 @@ public class Empresa {
 			.append(", ")
 			.append("email: ").append(email)
 			.append(", ")
-			.append("nombre de contacto: ").append(nombreContacto);
-			
+			.append("nombre de contacto: ").append(nombreContacto).append("]");
+
 		return sb.toString();
 	}
 }

@@ -2,6 +2,7 @@ package ar.edu.ungs.billetera;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class Billetera implements IBilletera {
@@ -32,7 +33,7 @@ public class Billetera implements IBilletera {
 	// METODOS PUBLICOS:
 	@Override
 	public String toString() {
-		// muestro estado de la billetera
+		// muestro estado de la billetera con stringbuilder. Para saltos de linea se usa System.lineSeparator()
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("Usuarios registrados: ")
@@ -40,25 +41,30 @@ public class Billetera implements IBilletera {
 		for (Usuario u : diccUsuariosPorDni.values()) {
 			sb.append("  ").append(u.toString()).append(System.lineSeparator());
 		}
+		
 		sb.append("Empresas registradas: ").append(diccEmpresasPorCuit.size()).append(System.lineSeparator());
 		for (Empresa e : diccEmpresasPorCuit.values()) {
 			sb.append("  ").append(e.toString()).append(System.lineSeparator());
 		}
+		
 		sb.append("Cuentas registradas: ").append(diccCuentasPorCvu.size()).append(System.lineSeparator());
 		for (Cuenta c : diccCuentasPorCvu.values()) {
 			sb.append("  ").append(c.toString()).append(" | saldo: ").append(c.getSaldo())
 					.append(System.lineSeparator());
 		}
+		
 		sb.append("Transferencias registradas: ").append(diccActividadesPorCvu.size()).append(System.lineSeparator());
 		for (List<Actividad> listAct : diccActividadesPorCvu.values()) {
 			for (Actividad act : listAct)
 				if (act instanceof Transferencia)
 					sb.append("  ").append(act.toString()).append(System.lineSeparator());
 		}
+		
 		sb.append("Inversiones registradas: ").append(diccInversionesPorId.size()).append(System.lineSeparator());
 		for (Inversion inv : diccInversionesPorId.values()) {
 			sb.append("  ").append(inv.toString()).append(System.lineSeparator());
 		}
+		
 		return sb.toString();
 	}
 
@@ -217,9 +223,6 @@ public class Billetera implements IBilletera {
 		diccActividadesPorCvu.get(cvuOrigen).add(transferencia);
 		diccActividadesPorCvu.get(cvuDestino).add(transferencia);
 
-		// Registrar en historial global
-		// historialGlobal.add("Transferencia de " + monto + " desde " + cvuOrigen + "
-		// hacia " + cvuDestino);
 
 	}
 
@@ -324,8 +327,8 @@ public class Billetera implements IBilletera {
 		return idInversion;
 	}
 
-	// no hay un diccionario de inversiones, agregarlo esta ok? asi como lo tenemos
-	// + diccInversionesPorId
+
+	@Override
 	public void precancelarInversion(String dni, String cvu, int idInversion) {
 
 		if (!diccUsuariosPorDni.containsKey(dni))
@@ -360,17 +363,7 @@ public class Billetera implements IBilletera {
 	}
 
 	public void procesarInversionesQueVencenHoy() {
-		/**
-		 * [Bonus Track]
-		 * 15) Procesa todas las inversiones que vencen el dia de hoy
-		 * y actualiza los saldos agregando los intereses generados segun el tipo de
-		 * inversion.
-		 * Sea por taza fija o por cotización de activos más tasa.
-		 * 
-		 * El dia actual y las cotizaciones de los activos se deben consultar a
-		 * Utilitarios.
-		 * 
-		 */
+		
 		for (Inversion inversion : diccInversionesPorId.values()) {
 			if (inversion.estaActiva() && inversion.venceHoy()) {
 				double montoInvertidoMasIntereses = inversion.calcularResultado();
@@ -407,7 +400,6 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public String consultarCvu(String alias) {
-
 		// podria haber diccAliasPorCvu, no hay un req de que esto debe ser en O(1), por
 		// lo que para no extender demasiado las estructuras de datos se implementa asi.
 		// Complejidad O(n)
@@ -435,6 +427,7 @@ public class Billetera implements IBilletera {
 					String estado = trans.getEstado() ? "Aprobado" : "Rechazado";
 
 					historial.add("- transferencia:\n" +
+							"fecha: " + trans.getFecha() + "\n" +
 							"origen: " + dniUsuario + " (" + cvuOrigen + ")\n" +
 							"destino: " + dniDestino + " (" + cvuDestino + ")\n" +
 							"monto: " + trans.getMonto() + "\n" +
@@ -446,6 +439,7 @@ public class Billetera implements IBilletera {
 					String estado = inv.getEstado() ? "Aprobado" : "Rechazado";
 
 					historial.add("- inversion:\n" +
+							"fecha: " + inv.getFecha() + "\n" +
 							"origen: " + dniUsuario + " (" + cvu + ")\n" +
 							"desc: " + tipo + "\n" +
 							"monto: " + inv.getMonto() + "\n" +
@@ -476,6 +470,7 @@ public class Billetera implements IBilletera {
 				String estado = trans.getEstado() ? "Aprobado" : "Rechazado";
 
 				historial.add("- transferencia:\n" +
+						"fecha: " + trans.getFecha() + "\n" +
 						"origen: " + dniOrigen + " (" + cvu + ")\n" +
 						"destino: " + dniDestino + " (" + cvuDestino + ")\n" +
 						"monto: " + trans.getMonto() + "\n" +
@@ -487,6 +482,7 @@ public class Billetera implements IBilletera {
 				String estado = inv.getEstado() ? "Aprobado" : "Rechazado";
 
 				historial.add("- inversion:\n" +
+						"fecha: " + inv.getFecha() + "\n" +
 						"origen: " + dniOrigen + " (" + cvu + ")\n" +
 						"desc: " + tipo + "\n" +
 						"monto: " + inv.getMonto() + "\n" +
@@ -526,6 +522,7 @@ public class Billetera implements IBilletera {
 				String estado = trans.getEstado() ? "Aprobado" : "Rechazado";
 
 				historial.add("- transferencia:\n" +
+						"fecha: " + trans.getFecha() + "\n" +
 						"origen: " + dniUsuario + " (" + cvuOrigen + ")\n" +
 						"destino: " + dniDestino + " (" + cvuDestino + ")\n" +
 						"monto: " + trans.getMonto() + "\n" +
@@ -537,6 +534,7 @@ public class Billetera implements IBilletera {
 				String estado = inv.getEstado() ? "Aprobado" : "Rechazado";
 
 				historial.add("- inversion:\n" +
+						"fecha: " + inv.getFecha() + "\n" +
 						"origen: " + dniUsuario + " (" + cvu + ")\n" +
 						"desc: " + tipo + "\n" +
 						"monto: " + inv.getMonto() + "\n" +
@@ -579,9 +577,18 @@ public class Billetera implements IBilletera {
 				}
 			}
 
-			resultado.add(cvuMayor); // guardamos el mas grande
+			Cuenta cuentaMayor = diccCuentasPorCvu.get(cvuMayor);
+			String tipo = cuentaMayor.getClass().getSimpleName().replace("Cuenta", "");
+			resultado.add(tipo + ": " + cuentaMayor.getAlias() + " (" + cvuMayor + ")");
 
-			cvus.remove(cvuMayor); // se elimina para buscar el sig más grande
+			// Usamos Iterator para eliminar de forma segura durante la iteracion
+			Iterator<String> it = cvus.iterator();
+			while (it.hasNext()) {
+				if (it.next().equals(cvuMayor)) {
+					it.remove();
+					break;
+				}
+			}
 		}
 
 		return resultado;
