@@ -112,9 +112,9 @@ public class Billetera implements IBilletera {
 		Usuario usuario = new Usuario(dni, nombre, telefono, email); // creo el usuario con los datos ingresados
 		diccUsuariosPorDni.put(dni, usuario); // si no esta registrado, lo agrega al diccionario de usuarios
 		
-		// inicializar
-		diccActividadesPorDNI.put(dni, new java.util.ArrayList<>());
-		diccTotalInvertidoPorDni.put(dni, 0.0); // Inicializar total invertido en 0
+		// inicializar para el usuario
+		diccActividadesPorDNI.put(dni, new ArrayList<>());
+		diccTotalInvertidoPorDni.put(dni, 0.0); // Inicializar total invertido en 0.0
 	}
 
 	@Override
