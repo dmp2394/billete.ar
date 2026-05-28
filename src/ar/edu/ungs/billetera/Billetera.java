@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class Billetera implements IBilletera {
 
-	private static final double MONTO_MINIMO_FLE = 20000000;
+	private final double MONTO_MINIMO_FLE = 20000000;
 
 
 	// ATRIBUTOS
@@ -310,13 +311,20 @@ public class Billetera implements IBilletera {
 		if (!cuenta.getDniUsuario().equals(dni))
 			throw new IllegalArgumentException("La cuenta no pertenece al usuario.");
 
+		if (monto < MONTO_MINIMO_FLE) {
+			String montoFormateado = String.format(
+				    Locale.forLanguageTag("es-AR"), 
+				    "%,.0f", 
+				    MONTO_MINIMO_FLE
+				);
+			throw new IllegalArgumentException("Esta inversion requiere un monto minimo de $" + montoFormateado);
+		}
+
 		if (cuenta.getSaldo() < monto)
 			throw new IllegalArgumentException("Saldo insuficiente para realizar la inversión.");
 
 		if (!(cuenta instanceof CuentaCorporativa))
 			throw new IllegalArgumentException("Esta inversion solo puede realizarse desde una Cuenta Corporativa");
-		if (monto < MONTO_MINIMO_FLE)
-			throw new IllegalArgumentException("Esta inversion requiere un monto minimo de " + MONTO_MINIMO_FLE);
 
 		InversionLiquidez inversion = new InversionLiquidez(cvu, monto, plazoDias);
 

@@ -36,7 +36,6 @@ public abstract class Inversion extends Actividad {
     public abstract double calcularResultado();
 
     protected void finalizar() {
-        this.actualizarFecha(Utilitarios.hoy());
         this.activa = false;
     }
 
@@ -46,8 +45,8 @@ public abstract class Inversion extends Actividad {
     }
 
     public String toString() {
-        return "Inversion [plazoDias=" + plazoDias + ", idInversion=" + idInversion + ", activa=" + activa
-                + ", fecha=" + fecha + ", monto=" + monto + ", cvu=" + getCvu() + "]";
+        return "Inversion [fecha=" + fecha + ", monto=" + monto + ", plazoDias=" + plazoDias
+                + ", idInversion=" + idInversion + ", cvu=" + getCvu() + "]";
     }
 
 }

@@ -57,9 +57,9 @@ public class InversionDivisa extends InversionPrecancelable {
     }
 
     public String toString() {
-        return "InversionDivisa [divisa=" + divisa + ", tasa=" + tasa + ", divisaEquivalente=" + divisaEquivalente
-                + ", idInversion=" + getIdInversion() + ", plazoDias=" + plazoDias + ", activa=" + activa
-                + ", fecha=" + fecha + ", monto=" + monto + ", cvu=" + getCvu() + "]";
+        return "InversionDivisa [fecha=" + fecha + ", monto=" + monto + ", divisa=" + divisa + ", tasa=" + (tasa * 100)
+                + "%, divisaEquivalente=" + divisaEquivalente + ", plazoDias=" + plazoDias
+                + ", idInversion=" + getIdInversion() + ", cvu=" + getCvu() + "]";
     }
 
 }

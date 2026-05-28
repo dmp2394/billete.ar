@@ -18,7 +18,7 @@ public class Transferencia extends Actividad {
 
     public String toString() {
         return "Transferencia [fecha=" + getFecha() + ", monto=" + getMonto() + ", cvuOrigen=" + getCvu()
-                + ", cvuDestino=" + cvuDestino + ", estado=" + getEstado() + "]";
+                + ", cvuDestino=" + cvuDestino + "]";
     }
 
 }
