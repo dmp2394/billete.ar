@@ -581,7 +581,7 @@ public class Billetera implements IBilletera {
 			String tipo = cuentaMayor.getClass().getSimpleName().replace("Cuenta", "");
 			resultado.add(tipo + ": " + cuentaMayor.getAlias() + " (" + cvuMayor + ")");
 
-			// Usamos Iterator para eliminar de forma segura durante la iteracion
+			// uso Iterator para eliminar de forma segura durante la iteracion
 			Iterator<String> it = cvus.iterator();
 			while (it.hasNext()) {
 				if (it.next().equals(cvuMayor)) {
