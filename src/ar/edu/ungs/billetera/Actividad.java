@@ -49,7 +49,4 @@ public abstract class Actividad {
         this.fecha = fecha;
     }
 
-    public String toString() {
-        return "Actividad [fecha=" + fecha + ", monto=" + monto + ", cvu=" + cvu + ", estado=" + estado + "]";
-    }
 }

@@ -26,7 +26,8 @@ public class InversionLiquidez extends Inversion {
 	}
 
 	public String toString() {
-		return "InversionLiquidez [fecha=" + fecha + ", monto=" + monto + ", tasa=" + (TASA_ACTIVO_FLE * 100)
+		String montoFormateado = String.format("%.2f", Math.floor(monto * 100) / 100.0);
+		return "InversionLiquidez [fecha=" + fecha + ", monto=" + montoFormateado + ", tasa=" + (TASA_ACTIVO_FLE * 100)
 				+ "%, plazoDias=" + plazoDias + ", idInversion=" + getIdInversion() + ", cvu=" + getCvu() + "]";
 	}
 

@@ -57,8 +57,10 @@ public class InversionDivisa extends InversionPrecancelable {
     }
 
     public String toString() {
-        return "InversionDivisa [fecha=" + fecha + ", monto=" + monto + ", divisa=" + divisa + ", tasa=" + (tasa * 100)
-                + "%, divisaEquivalente=" + divisaEquivalente + ", plazoDias=" + plazoDias
+        String montoFormateado = String.format("%.2f", Math.floor(monto * 100) / 100.0);
+        String divisaFormateado = String.format("%.2f", Math.floor(divisaEquivalente * 100) / 100.0);
+        return "InversionDivisa [fecha=" + fecha + ", monto=" + montoFormateado + ", divisa=" + divisa + ", tasa=" + (tasa * 100)
+                + "%, divisaEquivalente=" + divisaFormateado + ", plazoDias=" + plazoDias
                 + ", idInversion=" + getIdInversion() + ", cvu=" + getCvu() + "]";
     }
 

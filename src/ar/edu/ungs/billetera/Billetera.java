@@ -37,7 +37,7 @@ public class Billetera implements IBilletera {
 	// METODOS PUBLICOS:
 	@Override
 	public String toString() {
-		// muestro estado de la billetera con stringbuilder. Para saltos de linea se usa System.lineSeparator()
+		// formateo los montos/saldos a 2 decimales truncando para una correcta legibilidad. No se redondea para no perder información.
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("Usuarios registrados: ")
@@ -53,7 +53,7 @@ public class Billetera implements IBilletera {
 		
 		sb.append("Cuentas registradas: ").append(diccCuentasPorCvu.size()).append(System.lineSeparator());
 		for (Cuenta c : diccCuentasPorCvu.values()) {
-			sb.append("  ").append(c.toString()).append(" | saldo: ").append(c.getSaldo())
+			sb.append("  ").append(c.toString()).append(" | saldo: ").append(String.format("%.2f", Math.floor(c.getSaldo() * 100) / 100.0))
 					.append(System.lineSeparator());
 		}
 		

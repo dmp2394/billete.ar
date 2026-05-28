@@ -35,7 +35,8 @@ public class InversionRentaFija extends InversionPrecancelable {
 	}
 
 	public String toString() {
-		return "InversionRentaFija [fecha=" + fecha + ", monto=" + monto + ", tna=" + (TASA_INTERES_TNA * 100)
+		String montoFormateado = String.format("%.2f", Math.floor(monto * 100) / 100.0);
+		return "InversionRentaFija [fecha=" + fecha + ", monto=" + montoFormateado + ", tna=" + (TASA_INTERES_TNA * 100)
 				+ "%, plazoDias=" + plazoDias + ", idInversion=" + getIdInversion() + ", cvu=" + getCvu() + "]";
 	}
 

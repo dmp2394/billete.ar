@@ -17,7 +17,8 @@ public class Transferencia extends Actividad {
     }
 
     public String toString() {
-        return "Transferencia [fecha=" + getFecha() + ", monto=" + getMonto() + ", cvuOrigen=" + getCvu()
+        String montoFormateado = String.format("%.2f", Math.floor(getMonto() * 100) / 100.0);
+        return "Transferencia [fecha=" + getFecha() + ", monto=" + montoFormateado+ ", cvuOrigen=" + getCvu()
                 + ", cvuDestino=" + cvuDestino + "]";
     }
 

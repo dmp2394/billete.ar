@@ -44,9 +44,5 @@ public abstract class Inversion extends Actividad {
         return this.fecha.plusDays(plazoDias).equals(Utilitarios.hoy());
     }
 
-    public String toString() {
-        return "Inversion [fecha=" + fecha + ", monto=" + monto + ", plazoDias=" + plazoDias
-                + ", idInversion=" + idInversion + ", cvu=" + getCvu() + "]";
-    }
 
 }
