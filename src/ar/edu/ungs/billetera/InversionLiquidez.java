@@ -4,7 +4,8 @@ import java.time.temporal.ChronoUnit;
 
 public class InversionLiquidez extends Inversion {
 
-	final double TASA_ACTIVO_FLE = 0.08; // tasa sujeta a un activo particular (fijo) del 8%
+	// Tasa sujeta a un activo particular (fijo) del 8%
+	final double TASA_ACTIVO_FLE = 0.08; 
 
 	public InversionLiquidez(String cvu, double monto, int plazoDias) {
 		super(cvu, monto, plazoDias);

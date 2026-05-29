@@ -13,8 +13,7 @@ public class CuentaRegular extends Cuenta {
         return "CuentaRegular [dniUsuario=" + getDniUsuario() + ", alias=" + getAlias() + "]";
     }
 
-    // cuenta regular tiene su manera de acreditar, ya que tiene que validar que no
-    // se supere el saldo maximo de 5M
+    // Evalúa máximo de 5M
     public void acreditar(double monto) {
         if (this.saldo + monto > SALDO_MAXIMO)
             throw new IllegalStateException(

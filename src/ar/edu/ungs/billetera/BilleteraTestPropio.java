@@ -32,7 +32,7 @@ public class BilleteraTestPropio {
         billetera.procesarInversionesQueVencenHoy();
 
         assertEquals(0.0, billetera.obtenerTotalInvertido("11111111"), 0.01);
-        // saldo = (2M - 500K invertido) + (500K + intereses acreditados) = 2M + intereses
+        // Saldo = (2M - 500K invertido) + (500K + intereses acreditados) = 2M + intereses
         assertTrue(billetera.obtenerSaldoDisponible(cvu) > 2000000);
     }
 
@@ -49,7 +49,7 @@ public class BilleteraTestPropio {
         billetera.realizarTransferencia(cvu, cvu2, 15000);
         billetera.realizarTransferencia(cvu2, cvu, 15000);
         
-        // ingreso un valor invalido, porque hay 2 cuentas
+        // Ingreso de un valor inválido, porque hay 2 cuentas
         billetera.cuentasConMayorVolumen(4);
     }
 
@@ -66,7 +66,7 @@ public class BilleteraTestPropio {
         
         int id = billetera.realizarInversionLiquidez("11111111", cvuCorp, 20000000, 30);
 
-        // debe lanzar excepcion ya que inversion FLE no es precancelable
+        // Debe lanzar excepcion ya que inversion FLE no es precancelable
         billetera.precancelarInversion("11111111", cvuCorp, id);   
     }
 
@@ -78,7 +78,7 @@ public class BilleteraTestPropio {
         String cvuPremium = billetera.crearCuentaPremium("11111111", "alice.liq", 25000000);
         String cvuCorp = billetera.crearCuentaCorporativa("11111111", "corp.liq", "30-88888888-8");
         
-        // transfiero porque para hacer inversion liquidez hace falta cta corpo y no es posible crear una con dinero en cuenta
+        // Transferencia porque para hacer inversion liquidez hace falta cta corporativa y no es posible crear una con dinero en cuenta
         billetera.realizarTransferencia(cvuPremium, cvuCorp, 20000000);
         billetera.realizarInversionLiquidez("11111111", cvuCorp, 20000000, 30);
         

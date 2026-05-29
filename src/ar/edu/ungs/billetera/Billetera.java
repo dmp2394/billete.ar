@@ -10,8 +10,6 @@ import java.util.Set;
 
 public class Billetera implements IBilletera {
 
-
-
 	private final double MONTO_MINIMO_FLE = 20000000;
 
 	// ATRIBUTOS
@@ -23,7 +21,7 @@ public class Billetera implements IBilletera {
 	private HashMap<Integer, Inversion> diccInversionesPorId;
 	private HashMap<String, Double> diccTotalInvertidoPorDni;
 
-	// CONSTRUCTOR. INICIALIZO VARIABLES
+	// CONSTRUCTOR
 	public Billetera() {
 		this.diccEmpresasPorCuit = new HashMap<>();
 		this.diccUsuariosPorDni = new HashMap<>();
@@ -37,7 +35,8 @@ public class Billetera implements IBilletera {
 	// METODOS PUBLICOS:
 	@Override
 	public String toString() {
-		// formateo los montos/saldos a 2 decimales truncando para una correcta legibilidad. No se redondea para no perder información.
+		// Formatea los montos truncando a 2 decimales para mejorar legibilidad sin redondear valores.
+
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("Usuarios registrados: ")
@@ -57,6 +56,7 @@ public class Billetera implements IBilletera {
 					.append(System.lineSeparator());
 		}
 		
+		// Evita mostrar transferencias duplicada en el resumen general
 		Set<Actividad> transferenciasUnicas = new HashSet<>();
 		for (List<Actividad> listAct : diccActividadesPorCvu.values())
 			for (Actividad act : listAct)
@@ -102,31 +102,32 @@ public class Billetera implements IBilletera {
 	@Override
 	public void registrarUsuario(String dni, String nombre, String telefono, String email) {
 
-		if (diccUsuariosPorDni.containsKey(dni)) // busca si ya esta registrado un usuario con ese dni, si es asi lanza error
+		//Evalua que no exista
+		if (diccUsuariosPorDni.containsKey(dni)) 
 			throw new IllegalArgumentException("el usuario ya esta registrado");
 
-		Usuario usuario = new Usuario(dni, nombre, telefono, email); // creo el usuario con los datos ingresados
-		diccUsuariosPorDni.put(dni, usuario); // si no esta registrado, lo agrega al diccionario de usuarios
+		Usuario usuario = new Usuario(dni, nombre, telefono, email); 
+		diccUsuariosPorDni.put(dni, usuario); 
 		
-		// inicializar para el usuario
 		diccActividadesPorDNI.put(dni, new ArrayList<>());
-		diccTotalInvertidoPorDni.put(dni, 0.0); // Inicializar total invertido en 0.0
+		diccTotalInvertidoPorDni.put(dni, 0.0);
 	}
 
 	@Override
 	public String crearCuentaRegular(String dniUsuario, String alias) {
-
-		if (!diccUsuariosPorDni.containsKey(dniUsuario)) // busca si el usuario existe, si no existe lanza error
+		
+		//Valida existencia de usuario o alias
+		if (!diccUsuariosPorDni.containsKey(dniUsuario))
 			throw new IllegalArgumentException("el usuario no esta registrado");
-		if (diccCuentasPorCvu.containsKey(alias)) // busca si el alias ya esta registrado, si es asi lanza error
+		if (diccCuentasPorCvu.containsKey(alias))
 			throw new IllegalArgumentException("el alias ya esta registrado");
 
-		CuentaRegular cuentaRegular = new CuentaRegular(dniUsuario, alias); // crea la cuenta con los datos ingresados
+		CuentaRegular cuentaRegular = new CuentaRegular(dniUsuario, alias); 
 
 		String cvu = cuentaRegular.getCvu();
 
-		diccCuentasPorCvu.put(cvu, cuentaRegular); // agrega la cuenta al diccionario de cuentas con el cvu como clave
-		diccActividadesPorCvu.put(cvu, new java.util.ArrayList<>()); // Inicializar lista de actividades para la cuenta
+		diccCuentasPorCvu.put(cvu, cuentaRegular); 
+		diccActividadesPorCvu.put(cvu, new java.util.ArrayList<>()); 
 
 		return cvu;
 	}
@@ -174,17 +175,14 @@ public class Billetera implements IBilletera {
 	@Override
 	public List<String> obtenerCuentas(String dniUsuario) {
 
-		if (!diccUsuariosPorDni.containsKey(dniUsuario)) // busca si el usuario existe, si no existe lanza error
+		if (!diccUsuariosPorDni.containsKey(dniUsuario)) 
 			throw new IllegalArgumentException("el usuario no esta registrado");
 
-		List<String> cuentasUsuario = new java.util.ArrayList<>(); // creo una lista vacia para almacenar las cuentas
-																	// del usuario
+		List<String> cuentasUsuario = new java.util.ArrayList<>(); 
 
-		for (String cvu : diccCuentasPorCvu.keySet()) { // recorro el diccionario de cuentas
-			Cuenta cuenta = diccCuentasPorCvu.get(cvu); // obtengo la cuenta asociada al cvu
-			if (cuenta.getDniUsuario().equals(dniUsuario)) { // si el dni de la cuenta coincide con el dni del usuario,
-																// agrego a la lista el tipo de cuenta, el alias y el
-																// cvu
+		for (String cvu : diccCuentasPorCvu.keySet()) { 
+			Cuenta cuenta = diccCuentasPorCvu.get(cvu); 
+			if (cuenta.getDniUsuario().equals(dniUsuario)) {																
 				String tipo = cuenta.getClass().getSimpleName().replace("Cuenta", "");
 				cuentasUsuario.add(tipo + ": " + cuenta.getAlias() + " (" + cvu + ")");
 			}
@@ -364,7 +362,7 @@ public class Billetera implements IBilletera {
 
 		double montoInvertidoMasIntereses = inversion.precancelar();
 		
-		// como es una inversion que se terminó, actualizo el diccTotalInvertidoPorDni
+		// Al ser una inversion que se terminó, actualiza el diccTotalInvertidoPorDni
 		double totalInvertidoPorDni = diccTotalInvertidoPorDni.get(dni) - inversion.getMonto();
 		diccTotalInvertidoPorDni.put(dni, totalInvertidoPorDni);
 
@@ -375,6 +373,7 @@ public class Billetera implements IBilletera {
 	public void procesarInversionesQueVencenHoy() {
 		
 		for (Inversion inversion : diccInversionesPorId.values()) {
+			// Procesa únicamente inversiones activas que vencen en la fecha actual
 			if (inversion.estaActiva() && inversion.venceHoy()) {
 				double montoInvertidoMasIntereses = inversion.calcularResultado();
 
@@ -385,6 +384,7 @@ public class Billetera implements IBilletera {
 				cuenta.acreditar(montoInvertidoMasIntereses);
 				
 				String dni = cuenta.getDniUsuario();
+				// Se descuenta del total invertido porque la inversion finalizó
 				double totalInvertidoPorDni = diccTotalInvertidoPorDni.get(dni) - inversion.getMonto();
 				diccTotalInvertidoPorDni.put(dni, totalInvertidoPorDni);
 
@@ -410,9 +410,7 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public String consultarCvu(String alias) {
-		// podria haber diccAliasPorCvu, no hay un req de que esto debe ser en O(1), por
-		// lo que para no extender demasiado las estructuras de datos se implementa asi.
-		// Complejidad O(n)
+		// Búsqueda lineal de cuentas. Complejidad O(n)
 		for (Cuenta cuenta : diccCuentasPorCvu.values())
 			if (alias.equals(cuenta.getAlias()))
 				return cuenta.getCvu();
@@ -428,6 +426,8 @@ public class Billetera implements IBilletera {
 			List<Actividad> actividades = diccActividadesPorDNI.get(dniUsuario);
 
 			for (Actividad act : actividades) {
+				
+				//Formatea la actividad segun el tipo correspondiente
 				if (act instanceof Transferencia) {
 					Transferencia trans = (Transferencia) act;
 					String cvuOrigen = trans.getCvu();
@@ -505,6 +505,7 @@ public class Billetera implements IBilletera {
 		return historial;
 	}
 
+	//Determina el tipo de inversión para mostrarlo en texto
 	private String obtenerTipoInversion(Inversion inversion) {
 		if (inversion instanceof InversionRentaFija) {
 			return "renta fija";
@@ -577,15 +578,16 @@ public class Billetera implements IBilletera {
 			throw new IllegalArgumentException("cantidadTop no debe exceder la cantidad de cuentas creadas");
 
 		List<String> resultado = new ArrayList<>();
-		List<String> cvus = new ArrayList<>(diccActividadesPorCvu.keySet()); // guardamos cvus
+		List<String> cvus = new ArrayList<>(diccActividadesPorCvu.keySet()); 
 
+		//Busca la cuenta con mayor cantidad de actividades
 		for (int i = 0; i < cantidadTop; i++) {
 
-			String cvuMayor = cvus.get(0); // iniciamos en primer valor
+			String cvuMayor = cvus.get(0); 
 
 			for (String cvu : cvus) {
-
-				int valor1 = diccActividadesPorCvu.get(cvu).size(); // guardamos cuantas act tiene el cvu
+				//Guardar cantidad de actividad por cvu
+				int valor1 = diccActividadesPorCvu.get(cvu).size(); 
 				int valor2 = diccActividadesPorCvu.get(cvuMayor).size();
 
 				if (valor1 > valor2) {
@@ -597,7 +599,7 @@ public class Billetera implements IBilletera {
 			String tipo = cuentaMayor.getClass().getSimpleName().replace("Cuenta", "");
 			resultado.add(tipo + ": " + cuentaMayor.getAlias() + " (" + cvuMayor + ")");
 
-			// uso Iterator para eliminar de forma segura durante la iteracion
+			// Uso Iterator para eliminar de forma segura durante la iteracion
 			Iterator<String> it = cvus.iterator();
 			while (it.hasNext()) {
 				if (it.next().equals(cvuMayor)) {

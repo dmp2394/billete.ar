@@ -31,8 +31,7 @@ public class CuentaPremium extends Cuenta {
         this.saldo += monto;
     }
 
-    // cuenta premium tiene su manera de debitar, ya que tiene que mantener un monto
-    // mínimo en cuenta de 500 mil pesos
+    // Evalúa el minimo de 500 mil
     public void debitar(double monto) {
 
     	if ((this.saldo - monto) < SALDO_MINIMO)
