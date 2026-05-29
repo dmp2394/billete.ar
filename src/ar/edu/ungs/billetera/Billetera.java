@@ -57,9 +57,6 @@ public class Billetera implements IBilletera {
 					.append(System.lineSeparator());
 		}
 		
-		// esto lo hago para mostrar 1 sola transferencia en el estado de la billetera, sino se va a mostrar el mismo registro por duplicado
-		// convierto a HashSet y agrego Las transferencias que encuentro. Esto funciona porque ambas transferencias son el mismo objeto, pues 
-		// en realizarTransferencia se agrega la misma tanto en el cvu de origen como de destino
 		Set<Actividad> transferenciasUnicas = new HashSet<>();
 		for (List<Actividad> listAct : diccActividadesPorCvu.values())
 			for (Actividad act : listAct)
@@ -81,7 +78,6 @@ public class Billetera implements IBilletera {
 	@Override
 	public void registrarEmpresa(String cuit, String nombreFantasia, String telefono, String email,
 			String nombreContacto) {
-		// Lanza error si la empresa ya esta registrada o algun campo es inválido.
 		validarCamposRegistrarEmpresa(cuit, nombreFantasia, telefono, email, nombreContacto);
 
 		Empresa empresa = new Empresa(cuit, nombreFantasia, telefono, email, nombreContacto);
@@ -91,13 +87,11 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public void agregarPersonaAutorizada(String cuitEmpresa, String dniAutorizado) {
-		// Lanza error si la empresa no existe
 		if (!diccEmpresasPorCuit.containsKey(cuitEmpresa))
 			throw new IllegalArgumentException("la empresa no existe");
 
 		Empresa empresa = diccEmpresasPorCuit.get(cuitEmpresa);
 
-		// Lanza error si la persona ya está autorizada.
 		if (empresa.contienePersonaAutorizada(dniAutorizado))
 			throw new IllegalArgumentException("la persona ya esta autorizada");
 

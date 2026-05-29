@@ -22,7 +22,7 @@ public abstract class Inversion extends Actividad {
     }
 
     public int getIdInversion() {
-        return idInversion; // Retornar el ID almacenado
+        return idInversion; 
     }
 
     public int getPlazoDias() {
