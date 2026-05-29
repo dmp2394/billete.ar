@@ -21,10 +21,6 @@ public abstract class Cuenta {
         this.cvu = Utilitarios.generarSiguienteCvu();
     }
 
-    public String toString() {
-        return "Cuenta [dniUsuario=" + dniUsuario + ", alias=" + alias + "]";
-    }
-
     public String getDniUsuario() {
         return dniUsuario;
     }
